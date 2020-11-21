@@ -1,49 +1,55 @@
-const displayController = () => {
+import Projects from "./Projects";
+
+class DisplayController {
     // DOM Elements
-    let appDiv = document.getElementById("app");
+    constructor() {
+        this.appDiv = document.getElementById("app");
 
-    // Creating Elements
-    let containerDiv = document.createElement("div");
-    containerDiv.id = "container";
+        // Creating Elements
+        this.containerDiv = document.createElement("div");
 
-    let sidebarDiv = document.createElement("div");
-    sidebarDiv.id = "sidebar";
+        this.sidebarDiv = document.createElement("div");
 
-    let logoDiv = document.createElement("div");
-    logoDiv.classList.add("logo");
-    let logoImage = document.createElement("i");
-    logoImage.classList.add("logo-icon", "fas", "fa-th-list", "fa-2x");
-    let logoHR = document.createElement("hr");
-    
-    let sidebarContainerDiv = document.createElement("div");
-    sidebarContainerDiv.id = "sidebar-container";
-    let favoritesUL = document.createElement("ul");
-    favoritesUL.classList.add("favorites");
-    // let favoritesLI = document.createElement("li");
-    // favoritesLI.classList.add("project");
-    let sidebarHR = document.createElement("hr");
-    sidebarHR.classList.add("sidebar-container-hr");
+        this.logoDiv = document.createElement("div");
+        this.logoImage = document.createElement("i");
+        this.logoHR = document.createElement("hr");
+        
+        this.sidebarContainerDiv = document.createElement("div");
+        this.favoritesUL = document.createElement("ul");
+        // this.favoritesLI = document.createElement("li");
+        // favoritesLI.classList.add("project");
+        this.sidebarHR = document.createElement("hr");
 
-    // Appending Elements
-    appDiv.appendChild(containerDiv);
-    containerDiv.appendChild(sidebarDiv);
-    sidebarDiv.appendChild(logoDiv);
-    logoDiv.appendChild(logoImage);
-    logoDiv.appendChild(logoHR);
-    sidebarDiv.appendChild(sidebarContainerDiv);
-    sidebarContainerDiv.appendChild(favoritesUL);
-    sidebarContainerDiv.appendChild(sidebarHR);
+        // Adding style properties to Elements
+        this.containerDiv.id = "container";
+        this.sidebarDiv.id = "sidebar";
+        this.logoDiv.classList.add("logo");
+        this.logoImage.classList.add("logo-icon", "fas", "fa-th-list", "fa-2x");
+        this.sidebarContainerDiv.id = "sidebar-container";
+        this.favoritesUL.classList.add("favorites");
+        this.sidebarHR.classList.add("sidebar-container-hr");
 
-    // delete this, just to make sure appending favorites menu works
-    for (let i = 0; i < 5; i++) {
-        let favoritesLI = document.createElement("li");
-        if (i === 1) {
-            favoritesLI.classList.add("project-active");
-        } else {
-            favoritesLI.classList.add("project");
+         // Appending Elements
+        this.appDiv.appendChild(this.containerDiv);
+        this.containerDiv.appendChild(this.sidebarDiv);
+        this.sidebarDiv.appendChild(this.logoDiv);
+        this.logoDiv.appendChild(this.logoImage);
+        this.logoDiv.appendChild(this.logoHR);
+        this.sidebarDiv.appendChild(this.sidebarContainerDiv);
+        this.sidebarContainerDiv.appendChild(this.favoritesUL);
+        this.sidebarContainerDiv.appendChild(this.sidebarHR);
+
+        // delete this, just to make sure appending favorites menu works
+        for (let i = 0; i < 5; i++) {
+            this.favoritesLI = document.createElement("li");
+            if (i === 1) {
+                this.favoritesLI.classList.add("project-active");
+            } else {
+                this.favoritesLI.classList.add("project");
+            }
+            this.favoritesUL.appendChild(this.favoritesLI).innerText = i;
         }
-        favoritesUL.appendChild(favoritesLI).innerText = i;
-    }
+      }
 }
 
-export { displayController }
+export default DisplayController

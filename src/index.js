@@ -1,5 +1,3 @@
-import {displayController} from "./modules/Display";
-import {createItem} from "./modules/Items";
+import DisplayController from "./modules/Display";
 
-displayController();
-window.createItem = createItem;
+window.displayController = new DisplayController;
