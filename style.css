@@ -73,10 +73,26 @@ body {
 }
 
 .add-project-btn {
+	background-color: #333333;
+	border: none;
+	color: #ffffff;
 	margin-top: 40px;
+	margin-left: auto;
+	margin-right: auto;
 	text-align: center;
 	font-size: 1em;
 }
+.add-project-btn:hover {
+	cursor: pointer;
+}
+.add-project-btn: hover {
+	background-color: #464646;
+}
+.add-project-btn > button:focus {
+	border: none;
+	outline: none;
+}
+
 .project-btn {
 	color: #c84b25;
 	margin-right: 10px;
