@@ -5,25 +5,21 @@ import ProjectModel from "./models/project.model";
 
 class Projects {
     constructor() {
-        this.projects = JSON.parse(localStorage.getItem('projects')) || [new ProjectModel('Default')];
-        this.favorites = ["Inbox", "Today", "Soon"];
-        this.inbox = [];
-        this.today = [];
-        this.soon = [];
-        this.pageRender();
+        this.projects = JSON.parse(localStorage.getItem('projects')) || [];
     }
 
     createProject(title) {
         const newProject = new ProjectModel(title);
+        const newDisplay = new DisplayController();
         this.projects.push(newProject);
         localStorage.setItem('projects', JSON.stringify(this.projects));
+        newDisplay.refreshDOM();
     }
 
-    pageRender() {
-        let render = new DisplayController();
-        render.renderFavorites(this.favorites);
-        // render.renderProjects(this.projets);
-    }
+    // pageRender() {
+    //     let render = new DisplayController();
+    //     // render.renderProjects(this.projets);
+    // }
 }
 
 export default Projects;

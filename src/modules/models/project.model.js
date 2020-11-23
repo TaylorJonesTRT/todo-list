@@ -1,9 +1,10 @@
+const { v4: uuidv4 } = require('uuid');
+
 class ProjectModel {
-    constructor(id = 3, title, todos = []) {
+    constructor(title, todos = []) {
+        this.id = uuidv4;
         this.title = title;
         this.todos = todos;
-        this.id = id;
-        this.id++;
     }
 }
 

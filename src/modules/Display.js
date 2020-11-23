@@ -3,6 +3,7 @@ import Projects from "./Projects";
 class DisplayController {
     // DOM Elements
     constructor() {
+
         this.appDiv = document.getElementById("app");
 
         // Creating Elements
@@ -52,31 +53,46 @@ class DisplayController {
         // Assigning Eelements Randomness
         this.projectBtnSpan.innerText = "Add Project";
 
-        // Event Listeners
+        this.projCont = JSON.parse(localStorage.getItem('projects'));
 
+        this.renderFavorites(this.projCont);
+
+        // Event Listeners
+        this.addProjectBtn.addEventListener("click", function() {
+            let projCont = new Projects();
+            let testTitle = prompt("Project Title: ");
+            projCont.createProject(testTitle);
+        });
     }
-    renderFavorites(favorites) {
-        for (let i = 0; i < favorites.length; i++) {
-            this.favoritesLi = document.createElement("li");
-            this.favoritesLi.classList.add("project");
-            console.log(favorites[i]);
-            this.favoritesLi.textContent = favorites[i];
-            this.favoritesUL.appendChild(this.favoritesLi);
+    refreshDOM() {
+        this.clearDOM();
+        let display = new DisplayController();
+        display;
+    }
+
+    clearDOM() {
+        const appDiv = document.getElementById("app");
+        while (appDiv.firstChild) {
+        appDiv.removeChild(appDiv.lastChild);
         }
     }
-    // renderProjects(projects) {
-    //     if (projects.length === undefined) {
-    //         console.log("no projects yet");
-    //     } else {
-    //         for (let i = 0; i < projects.length; i++) {
-    //             this.projectsLi = document.createElement("li");
-    //             this.projectsLi.classList.add("project");
-    //             console.log(projects[i]);
-    //             this.projectsLi.textContent = projects[i];
-    //             this.userProjectsUl.appendChild(this.projectsLi);
-    //         }
-    //     }
-    // }
+
+    pageRender() {
+        let projCont = JSON.parse(localStorage.getItem('projects'));
+        this.clearDOM();
+        this.renderFavorites(projCont);
+    }
+
+    renderFavorites(favorites) {
+        if (favorites) {
+            for (let i = 0; i < favorites.length; i++) {
+                this.favoritesLi = document.createElement("li");
+                this.favoritesLi.classList.add("project");
+                this.favoritesLi.textContent = favorites[i].title;
+                this.favoritesUL.appendChild(this.favoritesLi);
+            }
+        }
+    }
 }
 
 export default DisplayController
