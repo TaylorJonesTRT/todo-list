@@ -16,10 +16,11 @@ class Projects {
         newDisplay.refreshDOM();
     }
 
-    // pageRender() {
-    //     let render = new DisplayController();
-    //     // render.renderProjects(this.projets);
-    // }
+    addItem(title, dueDate, description, priority, completionStatus) {
+        // Need to create display items first for the new item form
+        // so that can grab data from the input values
+        let newItem = new ItemModel(title, dueDate, description, priority, completionStatus);
+    }
 }
 
 export default Projects;
