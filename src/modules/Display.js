@@ -79,19 +79,10 @@ class DisplayController {
         this.addProjectBtn.appendChild(this.addProjectIco);
         this.addProjectBtn.appendChild(this.projectBtnSpan);
         this.containerDiv.appendChild(this.contentDiv);
-        this.contentDiv.appendChild(this.contentContainerDiv);
-        this.contentContainerDiv.appendChild(this.contentHeaderDiv);
-        this.contentHeaderDiv.appendChild(this.currentTitleSpan);
-        this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
-        this.contentContainerDiv.appendChild(this.contentBodyDiv);
         // this.renderItems(this.projCont);
-        this.contentBodyDiv.appendChild(this.addItemBtnDiv);
-        this.addItemBtnDiv.appendChild(this.addItemIco);
-        this.addItemBtnDiv.appendChild(this.addItemSpan);
 
         // Assigning Eelements Randomness
         this.projectBtnSpan.innerText = "Add Project";
-        this.addItemSpan.innerText = "Add Item"
 
         this.renderProjects(this.projCont);
 
@@ -110,9 +101,12 @@ class DisplayController {
             let itemCompStatus = prompt("Completed? (yes or no): ");
             eventProjCont.addItem(title, dueDate, description, priority, completionStatus);
         })
-        this.projectLi.addEventListener("click", function() {
-            // renderProject();
-        })
+        document.querySelectorAll(".project").forEach(project => {
+            project.addEventListener("click", event => {
+                this.clearContentDiv();
+                this.renderProjectPageHeader(event.target.dataset.id);
+            });
+        });
     }
     refreshDOM() {
         this.clearDOM();
@@ -122,7 +116,12 @@ class DisplayController {
 
     clearDOM() {
         while (this.appDiv.firstChild) {
-        this.appDiv.removeChild(this.appDiv.lastChild);
+            this.appDiv.removeChild(this.appDiv.lastChild);
+        }
+    }
+    clearContentDiv() {
+        while (this.contentDiv.firstChild) {
+            this.contentDiv.removeChild(this.contentDiv.lastChild);
         }
     }
 
@@ -137,12 +136,20 @@ class DisplayController {
             for (let i = 0; i < projects.length; i++) {
                 this.projectLi = document.createElement("li");
                 this.projectLi.classList.add("project");
-                console.log(projects);
                 this.projectLi.setAttribute("data-id", projects[i].id);
                 this.projectLi.textContent = projects[i].title;
                 this.userProjectsUl.appendChild(this.projectLi);
             }
         }
+    }
+
+    renderProjectPageHeader(projId) {
+        this.clearContentDiv();
+        this.currentTitleSpan.innerText = this.projCont.find(p => p.id === projId).title;
+        this.contentDiv.appendChild(this.contentContainerDiv);
+        this.contentContainerDiv.appendChild(this.contentHeaderDiv);
+        this.contentHeaderDiv.appendChild(this.currentTitleSpan);
+        this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
     }
 
     // renderItems(items) {
