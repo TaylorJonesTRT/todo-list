@@ -16,10 +16,10 @@ class Projects {
         newDisplay.refreshDOM();
     }
 
-    addItem(title, dueDate, description, priority, completionStatus) {
-        // Need to create display items first for the new item form
-        // so that can grab data from the input values
+    addItem(title, dueDate, description, priority, completionStatus, projId) {
         let newItem = new ItemModel(title, dueDate, description, priority, completionStatus);
+        this.projects.find(p => p.id === projId).todos.push(newItem);
+        localStorage.setItem("projects", JSON.stringify(this.projects));
     }
 }
 

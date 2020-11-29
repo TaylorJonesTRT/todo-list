@@ -161,6 +161,9 @@ body {
 .item-options {
 	float: right;
 }
+.item-options i {
+	margin-left: 10px;
+}
 
 .add-item-btn {
 	float: left;
