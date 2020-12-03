@@ -11,16 +11,12 @@ class DisplayController {
 
         // Creating Elements
         this.containerDiv = document.createElement("div");
-        // May need to move some of the below to the renderTodos() method
-        // so that they can be dynamically created over and over
         this.contentDiv = document.createElement("div");
         this.contentContainerDiv = document.createElement("div");
         this.contentHeaderDiv = document.createElement("div");
         this.currentTitleSpan = document.createElement("span");
         this.projectSettingsIcon = document.createElement("i");
         this.contentBodyDiv = document.createElement("div");
-        // Item display elements that need to be moved into the
-        // render items method
         this.addItemBtnDiv = document.createElement("div");
         this.addItemIco = document.createElement("i");
         this.addItemSpan = document.createElement("span");
@@ -46,20 +42,12 @@ class DisplayController {
         this.containerDiv.appendChild(this.contentDiv);
         // this.renderItems(this.projCont);
 
-        // Assigning Eelements Randomness
-        this.projectBtnSpan.innerText = "Add Project";
-
-        this.renderProjects(this.projCont);
+        // TODO: Need to call all methods for building the page here
+        this.createSidebar();
 
         // Event Listeners
-        this.addProjectBtn.addEventListener("click", function() {
-            let eventProjCont = new Projects();
-            let projTitle = prompt("Project Title: ");
-            eventProjCont.createProject(projTitle);
-        });
         document.querySelectorAll(".project").forEach(project => {
             project.addEventListener("click", event => {
-                this.clearContentDiv();
                 this.renderProjectPage(event.target.dataset.id);
             });
         });
@@ -68,7 +56,12 @@ class DisplayController {
         // This will be used to clear everything from the DOM
         // Argument that will be passed is the section to be refreshed
         if (area === "all") {
+            // Need to call this same function on itself to clear out everything rather than having the same code
+            // be in multiple spots
 
+            while (this.appDiv.firstChild) {
+                this.appDiv.removeChild(this.appDiv.lastChild);
+            }
         } else if (area === "sidebar") {
             // Logo area
             while (this.logoDiv.firstChild) {
@@ -100,22 +93,12 @@ class DisplayController {
             while (this.contentContainerDiv.firstChild) {
                 this.contentContainerDiv.removeChild(this.contentContainerDiv.lastChild);
             }
-            while (this.contentDiv.firstChild) {
-                this.contentDiv.removeChild(this.contentDiv.lastChild);
-            }
             // TODO: Need to add method call to render content area once it's changed around
         } else if (area === "items") {
-
+            // TODO: Finish this area of the else if logic
         }
         // let display = new DisplayController();
         // display;
-    }
-
-    clearDOM() {
-        while (this.appDiv.firstChild) {
-            this.appDiv.removeChild(this.appDiv.lastChild);
-        }
-        this.appDiv.innerHTML = "";
     }
 
     createSidebar() {
@@ -147,18 +130,16 @@ class DisplayController {
         this.sidebarContainerDiv.appendChild(this.addProjectBtn);
         this.addProjectBtn.appendChild(this.addProjectIco);
         this.addProjectBtn.appendChild(this.projectBtnSpan);
+        this.projectBtnSpan.innerText = "Add Project";
+        this.addProjectBtn.addEventListener("click", function() {
+            let eventProjCont = new Projects();
+            let projTitle = prompt("Project Title: ");
+            eventProjCont.createProject(projTitle);
+        });
+        this.renderProjectsUl(this.projCont);
     }
 
-    createContentArea() {
-    }
-
-    pageRender() {
-        let projCont = JSON.parse(localStorage.getItem('projects'));
-        this.clearDOM();
-        this.renderProjects(projCont);
-    }
-
-    renderProjects(projects) {
+    renderProjectsUl(projects) {
         if (projects) {
             for (let i = 0; i < projects.length; i++) {
                 this.projectLi = document.createElement("li");
@@ -168,6 +149,22 @@ class DisplayController {
                 this.userProjectsUl.appendChild(this.projectLi);
             }
         }
+    }
+    renderProjectPage(projId) {
+        this.refreshDOM("content");
+        this.currentTitleSpan.innerText = this.projCont.find(p => p.id === projId).title;
+        this.currentTitleSpan.setAttribute("data-proj-id", projId);
+        this.contentDiv.appendChild(this.contentContainerDiv);
+        this.contentContainerDiv.appendChild(this.contentHeaderDiv);
+        this.contentHeaderDiv.appendChild(this.currentTitleSpan);
+        this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
+        this.contentContainerDiv.appendChild(this.contentBodyDiv);
+        this.renderItems(projId);
+        this.contentBodyDiv.appendChild(this.addItemBtnDiv);
+        this.addItemBtnDiv.appendChild(this.addItemIco);
+        this.addItemSpan.innerText = "Add Item";
+        this.addItemBtnDiv.appendChild(this.addItemSpan);
+        this.addItemEvent(projId);
     }
     renderItems(projId) {
         let projItems = this.projCont.find(p => p.id === projId).todos;
@@ -202,35 +199,19 @@ class DisplayController {
         }
     }
 
-    renderProjectPage(projId) {
-        this.clearContentDiv();
-        this.currentTitleSpan.innerText = this.projCont.find(p => p.id === projId).title;
-        this.currentTitleSpan.setAttribute("data-proj-id", projId);
-        this.contentDiv.appendChild(this.contentContainerDiv);
-        this.contentContainerDiv.appendChild(this.contentHeaderDiv);
-        this.contentHeaderDiv.appendChild(this.currentTitleSpan);
-        this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
-        this.contentContainerDiv.appendChild(this.contentBodyDiv);
-        this.renderItems(projId);
-        this.contentBodyDiv.appendChild(this.addItemBtnDiv);
-        this.addItemBtnDiv.appendChild(this.addItemIco);
-        this.addItemSpan.innerText = "Add Item";
-        this.addItemBtnDiv.appendChild(this.addItemSpan);
-        // this.addItemEvent(projId);
+    addItemEvent(projId) {
+        this.addItemBtnDiv.addEventListener("click", function() {
+            let eventProjCont = new Projects();
+            let itemTitle = prompt("Item Title: ");
+            let itemDueDate = prompt("Due Date (dd-MMM): ");
+            let itemDescription = prompt("Desdcription: ");
+            let itemPrio = prompt("Priority (High, Medium, Low): ");
+            let itemCompStatus = prompt("Completed? (yes or no): ");
+            eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
+            this.refreshDOM("content");
+            this.renderProjectPage(projId);
+        });
     }
-
-    // addItemEvent(projId) {
-    //     this.addItemBtnDiv.addEventListener("click", function() {
-    //         let eventProjCont = new Projects();
-    //         let itemTitle = prompt("Item Title: ");
-    //         let itemDueDate = prompt("Due Date (dd-MMM): ");
-    //         let itemDescription = prompt("Desdcription: ");
-    //         let itemPrio = prompt("Priority (High, Medium, Low): ");
-    //         let itemCompStatus = prompt("Completed? (yes or no): ");
-    //         eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
-    //         renderProjectPage(projId);
-    //     });
-    // }
 }
 
 export default DisplayController
