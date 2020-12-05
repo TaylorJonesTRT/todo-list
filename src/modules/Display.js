@@ -21,38 +21,30 @@ class DisplayController {
         this.addItemIco = document.createElement("i");
         this.addItemSpan = document.createElement("span");
 
-
         // Adding style properties to Elements
         this.containerDiv.id = "container";
-
         this.contentDiv.id = "content";
         this.contentContainerDiv.id = "content-container";
         this.contentHeaderDiv.classList.add("content-header");
         this.currentTitleSpan.classList.add("current-project-title");
         this.projectSettingsIcon.classList.add("fas", "fa-ellipsis-h", "fa-lg", "settings-icon");
         this.contentBodyDiv.classList.add("content-body");
-
         this.addItemBtnDiv.classList.add("add-item-btn");
         this.addItemIco.classList.add("fas", "fa-plus", "item-btn");
         this.addItemSpan.classList.add("add-item-text");
 
          // Appending Elements
         this.appDiv.appendChild(this.containerDiv);
-        
         this.containerDiv.appendChild(this.contentDiv);
-        // this.renderItems(this.projCont);
+
 
         // TODO: Need to call all methods for building the page here
         this.createSidebar();
-
-        // Event Listeners
-        document.querySelectorAll(".project").forEach(project => {
-            project.addEventListener("click", event => {
-                this.renderProjectPage(event.target.dataset.id);
-            });
-        });
+        let initialPage = document.querySelector(".project").getAttribute("data-id");
+        this.renderProjectPage(initialPage);
     }
-    refreshDOM(area) {
+
+    refreshDOM(area, projId) {
         // This will be used to clear everything from the DOM
         // Argument that will be passed is the section to be refreshed
         if (area === "all") {
@@ -97,8 +89,6 @@ class DisplayController {
         } else if (area === "items") {
             // TODO: Finish this area of the else if logic
         }
-        // let display = new DisplayController();
-        // display;
     }
 
     createSidebar() {
@@ -131,12 +121,20 @@ class DisplayController {
         this.addProjectBtn.appendChild(this.addProjectIco);
         this.addProjectBtn.appendChild(this.projectBtnSpan);
         this.projectBtnSpan.innerText = "Add Project";
+
         this.addProjectBtn.addEventListener("click", function() {
             let eventProjCont = new Projects();
             let projTitle = prompt("Project Title: ");
             eventProjCont.createProject(projTitle);
+            this.refreshDOM("sidebar");
         });
+
         this.renderProjectsUl(this.projCont);
+        document.querySelectorAll(".project").forEach(project => {
+            project.addEventListener("click", event => {
+                this.renderProjectPage(event.target.dataset.id);
+            });
+        });
     }
 
     renderProjectsUl(projects) {
@@ -150,6 +148,11 @@ class DisplayController {
             }
         }
     }
+
+    createContentArea() {
+        //TODO: Need to move the remaining elements
+    }
+
     renderProjectPage(projId) {
         this.refreshDOM("content");
         this.currentTitleSpan.innerText = this.projCont.find(p => p.id === projId).title;
@@ -208,8 +211,7 @@ class DisplayController {
             let itemPrio = prompt("Priority (High, Medium, Low): ");
             let itemCompStatus = prompt("Completed? (yes or no): ");
             eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
-            this.refreshDOM("content");
-            this.renderProjectPage(projId);
+            this.refreshDOM("content", projId);
         });
     }
 }
