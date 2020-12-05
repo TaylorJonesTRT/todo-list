@@ -10,10 +10,8 @@ class Projects {
 
     createProject(title) {
         const newProject = new ProjectModel(title);
-        const newDisplay = new DisplayController();
         this.projects.push(newProject);
         localStorage.setItem('projects', JSON.stringify(this.projects));
-        newDisplay.refreshDOM();
     }
 
     addItem(title, dueDate, description, priority, completionStatus, projId) {

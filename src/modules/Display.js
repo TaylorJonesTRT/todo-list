@@ -3,9 +3,6 @@ import Projects from "./Projects";
 class DisplayController {
     // DOM Elements
     constructor() {
-        // Fetching the Projects
-        this.projCont = JSON.parse(localStorage.getItem('projects'));
-
         // Grabbing the hard coded app div
         this.appDiv = document.getElementById("app");
 
@@ -37,11 +34,7 @@ class DisplayController {
         this.appDiv.appendChild(this.containerDiv);
         this.containerDiv.appendChild(this.contentDiv);
 
-
-        // TODO: Need to call all methods for building the page here
         this.createSidebar();
-        let initialPage = document.querySelector(".project").getAttribute("data-id");
-        this.renderProjectPage(initialPage);
     }
 
     refreshDOM(area, projId) {
@@ -63,14 +56,17 @@ class DisplayController {
             while (this.userProjectsUl.firstChild) {
                 this.userProjectsUl.removeChild(this.userProjectsUl.lastChild);
             }
-            // sidebarContainer area
-            while (this.sidebarContainerDiv.firstChild) {
-                this.sidebarContainerDiv.removeChild(this.sidebarContainerDiv.lastChild);
-            }
             // addProjectBtn area
             while (this.addProjectBtn.firstChild) {
                 this.addProjectBtn.removeChild(this.addProjectBtn.lastChild);
             }
+            // sidebarContainer area
+            while (this.sidebarContainerDiv.firstChild) {
+                this.sidebarContainerDiv.removeChild(this.sidebarContainerDiv.lastChild);
+            }
+            this.sidebarDiv.removeChild(this.logoDiv);
+            this.sidebarDiv.removeChild(this.sidebarContainerDiv);
+            this.containerDiv.removeChild(this.sidebarDiv);
             this.createSidebar();
         } else if (area === "content") {
             while (this.contentHeaderDiv.firstChild) {
@@ -122,14 +118,16 @@ class DisplayController {
         this.addProjectBtn.appendChild(this.projectBtnSpan);
         this.projectBtnSpan.innerText = "Add Project";
 
-        this.addProjectBtn.addEventListener("click", function() {
+        let projectList = JSON.parse(localStorage.getItem('projects'));
+        this.renderProjectsUl(projectList);
+
+        this.addProjectBtn.addEventListener("click", () => {
             let eventProjCont = new Projects();
             let projTitle = prompt("Project Title: ");
             eventProjCont.createProject(projTitle);
             this.refreshDOM("sidebar");
         });
 
-        this.renderProjectsUl(this.projCont);
         document.querySelectorAll(".project").forEach(project => {
             project.addEventListener("click", event => {
                 this.renderProjectPage(event.target.dataset.id);
@@ -149,13 +147,10 @@ class DisplayController {
         }
     }
 
-    createContentArea() {
-        //TODO: Need to move the remaining elements
-    }
-
     renderProjectPage(projId) {
+        let updatedProjects = JSON.parse(localStorage.getItem('projects'));
         this.refreshDOM("content");
-        this.currentTitleSpan.innerText = this.projCont.find(p => p.id === projId).title;
+        this.currentTitleSpan.innerText = updatedProjects.find(p => p.id === projId).title;
         this.currentTitleSpan.setAttribute("data-proj-id", projId);
         this.contentDiv.appendChild(this.contentContainerDiv);
         this.contentContainerDiv.appendChild(this.contentHeaderDiv);
@@ -170,7 +165,8 @@ class DisplayController {
         this.addItemEvent(projId);
     }
     renderItems(projId) {
-        let projItems = this.projCont.find(p => p.id === projId).todos;
+        let updatedProjects = JSON.parse(localStorage.getItem('projects'));
+        let projItems = updatedProjects.find(p => p.id === projId).todos;
         if (projId.length > 0) {
             projItems.forEach(item => {
                 this.itemsDiv = document.createElement("div");
@@ -211,7 +207,7 @@ class DisplayController {
             let itemPrio = prompt("Priority (High, Medium, Low): ");
             let itemCompStatus = prompt("Completed? (yes or no): ");
             eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
-            this.refreshDOM("content", projId);
+            this.refreshDOM("items", projId);
         });
     }
 }
