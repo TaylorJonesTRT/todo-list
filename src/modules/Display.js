@@ -7,6 +7,8 @@ class DisplayController {
         this.appDiv = document.getElementById("app");
 
         // Creating Elements
+        // TODO: Bring back all element creations to the constructor besides those for rendering items
+        
         this.containerDiv = document.createElement("div");
         this.contentDiv = document.createElement("div");
         this.contentContainerDiv = document.createElement("div");
@@ -69,6 +71,13 @@ class DisplayController {
             this.containerDiv.removeChild(this.sidebarDiv);
             this.createSidebar();
         } else if (area === "content") {
+
+            if (document.querySelector(".items")) {
+                while(this.itemsDiv.firstChild) {
+                    this.itemsDiv.removeChild(this.itemsDiv.lastChild);
+                }
+            }
+
             while (this.contentHeaderDiv.firstChild) {
                 this.contentHeaderDiv.removeChild(this.contentHeaderDiv.lastChild);
             }
@@ -81,9 +90,6 @@ class DisplayController {
             while (this.contentContainerDiv.firstChild) {
                 this.contentContainerDiv.removeChild(this.contentContainerDiv.lastChild);
             }
-            // TODO: Need to add method call to render content area once it's changed around
-        } else if (area === "items") {
-            // TODO: Finish this area of the else if logic
         }
     }
 
@@ -130,7 +136,8 @@ class DisplayController {
 
         document.querySelectorAll(".project").forEach(project => {
             project.addEventListener("click", event => {
-                this.renderProjectPage(event.target.dataset.id);
+                let id = event.target.dataset.id;
+                this.renderProjectPage(id);
             });
         });
     }
@@ -149,6 +156,9 @@ class DisplayController {
 
     renderProjectPage(projId) {
         let updatedProjects = JSON.parse(localStorage.getItem('projects'));
+        let projItems = updatedProjects.find(p => p.id === projId).todos;
+        let currentProj = projId;
+        
         this.refreshDOM("content");
         this.currentTitleSpan.innerText = updatedProjects.find(p => p.id === projId).title;
         this.currentTitleSpan.setAttribute("data-proj-id", projId);
@@ -157,18 +167,10 @@ class DisplayController {
         this.contentHeaderDiv.appendChild(this.currentTitleSpan);
         this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
         this.contentContainerDiv.appendChild(this.contentBodyDiv);
-        this.renderItems(projId);
-        this.contentBodyDiv.appendChild(this.addItemBtnDiv);
-        this.addItemBtnDiv.appendChild(this.addItemIco);
-        this.addItemSpan.innerText = "Add Item";
-        this.addItemBtnDiv.appendChild(this.addItemSpan);
-        this.addItemEvent(projId);
-    }
-    renderItems(projId) {
-        let updatedProjects = JSON.parse(localStorage.getItem('projects'));
-        let projItems = updatedProjects.find(p => p.id === projId).todos;
-        if (projId.length > 0) {
+        // this.renderItems(projId);
+        if (projItems.length >= 1) {
             projItems.forEach(item => {
+                // TODO: Refactor all of this code below to use a UL instead of a separate div for each item
                 this.itemsDiv = document.createElement("div");
                 this.itemsDiv.classList.add("items");
                 this.itemOptionsDiv = document.createElement("div");
@@ -196,18 +198,21 @@ class DisplayController {
                 this.contentBodyDiv.appendChild(this.itemHr);
             });
         }
-    }
 
-    addItemEvent(projId) {
-        this.addItemBtnDiv.addEventListener("click", function() {
+        this.contentBodyDiv.appendChild(this.addItemBtnDiv);
+        this.addItemBtnDiv.appendChild(this.addItemIco);
+        this.addItemSpan.innerText = "Add Item";
+        this.addItemBtnDiv.appendChild(this.addItemSpan);
+
+        this.addItemBtnDiv.addEventListener("click", () => {
             let eventProjCont = new Projects();
             let itemTitle = prompt("Item Title: ");
             let itemDueDate = prompt("Due Date (dd-MMM): ");
             let itemDescription = prompt("Desdcription: ");
             let itemPrio = prompt("Priority (High, Medium, Low): ");
             let itemCompStatus = prompt("Completed? (yes or no): ");
-            eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
-            this.refreshDOM("items", projId);
+            eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, currentProj);
+            this.renderProjectPage(currentProj);
         });
     }
 }
