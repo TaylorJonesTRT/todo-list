@@ -8,7 +8,17 @@ class DisplayController {
 
         // Creating Elements
         // TODO: Bring back all element creations to the constructor besides those for rendering items
-        
+        this.sidebarDiv = document.createElement("div");
+        this.logoDiv = document.createElement("div");
+        this.logoImage = document.createElement("i");
+        this.logoHR = document.createElement("hr");
+        this.sidebarContainerDiv = document.createElement("div");
+        this.sidebarHR = document.createElement("hr");
+        this.userProjectsUl = document.createElement("ul");
+        this.addProjectBtn = document.createElement("BUTTON");
+        this.addProjectIco = document.createElement("i");
+        this.projectBtnSpan = document.createElement("span");
+
         this.containerDiv = document.createElement("div");
         this.contentDiv = document.createElement("div");
         this.contentContainerDiv = document.createElement("div");
@@ -16,11 +26,22 @@ class DisplayController {
         this.currentTitleSpan = document.createElement("span");
         this.projectSettingsIcon = document.createElement("i");
         this.contentBodyDiv = document.createElement("div");
+        this.itemDiv = document.createElement("div");
         this.addItemBtnDiv = document.createElement("div");
         this.addItemIco = document.createElement("i");
         this.addItemSpan = document.createElement("span");
 
         // Adding style properties to Elements
+        this.sidebarDiv.id = "sidebar";
+        this.logoDiv.classList.add("logo");
+        this.logoImage.classList.add("logo-icon", "fas", "fa-th-list", "fa-2x");
+        this.sidebarContainerDiv.id = "sidebar-container";
+        this.sidebarHR.classList.add("sidebar-container-hr");
+        this.userProjectsUl.classList.add("user-projects");
+        this.addProjectBtn.classList.add("add-project-btn");
+        this.addProjectIco.classList.add("fas", "fa-plus", "project-btn");
+        this.projectBtnSpan.classList.add("add-task-text");
+
         this.containerDiv.id = "container";
         this.contentDiv.id = "content";
         this.contentContainerDiv.id = "content-container";
@@ -28,6 +49,7 @@ class DisplayController {
         this.currentTitleSpan.classList.add("current-project-title");
         this.projectSettingsIcon.classList.add("fas", "fa-ellipsis-h", "fa-lg", "settings-icon");
         this.contentBodyDiv.classList.add("content-body");
+        this.itemDiv.classList.add("items");
         this.addItemBtnDiv.classList.add("add-item-btn");
         this.addItemIco.classList.add("fas", "fa-plus", "item-btn");
         this.addItemSpan.classList.add("add-item-text");
@@ -73,8 +95,8 @@ class DisplayController {
         } else if (area === "content") {
 
             if (document.querySelector(".items")) {
-                while(this.itemsDiv.firstChild) {
-                    this.itemsDiv.removeChild(this.itemsDiv.lastChild);
+                while(this.itemHolderDiv.firstChild) {
+                    this.itemHolderDiv.removeChild(this.itemHolderDiv.lastChild);
                 }
             }
 
@@ -94,25 +116,6 @@ class DisplayController {
     }
 
     createSidebar() {
-        this.sidebarDiv = document.createElement("div");
-        this.logoDiv = document.createElement("div");
-        this.logoImage = document.createElement("i");
-        this.logoHR = document.createElement("hr");
-        this.sidebarContainerDiv = document.createElement("div");
-        this.sidebarHR = document.createElement("hr");
-        this.userProjectsUl = document.createElement("ul");
-        this.addProjectBtn = document.createElement("BUTTON");
-        this.addProjectIco = document.createElement("i");
-        this.projectBtnSpan = document.createElement("span");
-        this.sidebarDiv.id = "sidebar";
-        this.logoDiv.classList.add("logo");
-        this.logoImage.classList.add("logo-icon", "fas", "fa-th-list", "fa-2x");
-        this.sidebarContainerDiv.id = "sidebar-container";
-        this.sidebarHR.classList.add("sidebar-container-hr");
-        this.userProjectsUl.classList.add("user-projects");
-        this.addProjectBtn.classList.add("add-project-btn");
-        this.addProjectIco.classList.add("fas", "fa-plus", "project-btn");
-        this.projectBtnSpan.classList.add("add-task-text");
         this.containerDiv.appendChild(this.sidebarDiv);
         this.sidebarDiv.appendChild(this.logoDiv);
         this.logoDiv.appendChild(this.logoImage);
@@ -168,11 +171,10 @@ class DisplayController {
         this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
         this.contentContainerDiv.appendChild(this.contentBodyDiv);
         // this.renderItems(projId);
-        if (projItems.length >= 1) {
+        if (projItems.length > 0) {
             projItems.forEach(item => {
-                // TODO: Refactor all of this code below to use a UL instead of a separate div for each item
-                this.itemsDiv = document.createElement("div");
-                this.itemsDiv.classList.add("items");
+                this.itemHolderDiv = document.createElement("div");
+                this.itemHolderDiv.classList.add("item");
                 this.itemOptionsDiv = document.createElement("div");
                 this.itemOptionsDiv.classList.add("item-options");
                 this.editIconOnHover = document.createElement("i");
@@ -188,13 +190,14 @@ class DisplayController {
                 this.dueDateDiv.innerText = item.dueDate;
                 this.itemHr = document.createElement("hr");
 
-                this.contentBodyDiv.appendChild(this.itemsDiv);
-                this.itemsDiv.appendChild(this.itemOptionsDiv);
+                this.contentBodyDiv.appendChild(this.itemDiv);
+                this.itemDiv.appendChild(this.itemHolderDiv);
+                this.itemHolderDiv.appendChild(this.itemOptionsDiv);
                 this.itemOptionsDiv.appendChild(this.editIconOnHover);
                 this.itemOptionsDiv.appendChild(this.itemSettingsOnHover);
-                this.itemsDiv.appendChild(this.itemTitleDiv);
-                this.itemsDiv.appendChild(this.itemRowBr);
-                this.itemsDiv.appendChild(this.dueDateDiv);
+                this.itemHolderDiv.appendChild(this.itemTitleDiv);
+                this.itemHolderDiv.appendChild(this.itemRowBr);
+                this.itemHolderDiv.appendChild(this.dueDateDiv);
                 this.contentBodyDiv.appendChild(this.itemHr);
             });
         }
@@ -212,7 +215,6 @@ class DisplayController {
             let itemPrio = prompt("Priority (High, Medium, Low): ");
             let itemCompStatus = prompt("Completed? (yes or no): ");
             eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, currentProj);
-            this.renderProjectPage(currentProj);
         });
     }
 }
