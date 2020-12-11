@@ -54,12 +54,11 @@ class DisplayController {
             let eventProjCont = new Projects();
             let projTitle = prompt("Project Title: ");
             eventProjCont.createProject(projTitle);
-            this.refreshDOM("sidebar");
+            this.clearChildNodes("sidebar");
         });
 
         document.querySelectorAll(".project").forEach(project => {
             project.addEventListener("click", event => {
-                console.log(event.target.dataset.id);
                 this.renderProject(event.target.dataset.id);
             });
         });
@@ -173,12 +172,16 @@ class DisplayController {
         let itemPrio = prompt("Priority (High, Medium, Low): ");
         let itemCompStatus = prompt("Completed? (yes or no): ");
         eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
-        this.clearChildNodes("content");
         this.renderProject(projId);
     }
 
     clearChildNodes(area) {
         if (area === "content") {
+            if (this.contentDiv.firstElementChild) {
+                while (this.contentContainerDiv.firstElementChild) {
+                    this.contentContainerDiv.removeChild(this.contentContainerDiv.firstElementChild);
+                }
+            }
             while (this.contentDiv.firstElementChild) {
                 this.contentDiv.removeChild(this.contentDiv.firstElementChild);
             }
@@ -196,9 +199,23 @@ class DisplayController {
                 this.itemContainerDiv.removeChild(this.itemContainerDiv.firstElementChild);
             }
         } else if (area === "sidebar") {
+            while (this.addProjectBtn.firstElementChild) {
+                this.addProjectBtn.removeChild(this.addProjectBtn.firstElementChild);
+            }
+            while (this.userProjectsUl.firstElementChild) {
+                this.userProjectsUl.removeChild(this.userProjectsUl.firstElementChild);
+            }
+            while (this.logoDiv.firstElementChild) {
+                this.logoDiv.removeChild(this.logoDiv.firstElementChild);
+            }
+            while(this.sidebarContainerDiv.firstElementChild) {
+                this.sidebarContainerDiv.removeChild(this.sidebarContainerDiv.firstElementChild);
+            }
             while (this.sidebarDiv.firstElementChild) {
                 this.sidebarDiv.removeChild(this.sidebarDiv.firstElementChild);
             }
+            this.containerDiv.removeChild(this.sidebarDiv);
+            this.createSidebar();
         } else if (area === "all") {
             while (this.containerDiv.firstElementChild) {
                 this.containerDiv.removeChild(this.containerDiv.firstElementChild);
