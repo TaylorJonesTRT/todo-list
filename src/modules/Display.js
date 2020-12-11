@@ -1,13 +1,20 @@
 import Projects from "./Projects";
 
 class DisplayController {
-    // DOM Elements
     constructor() {
         // Grabbing the hard coded app div
         this.appDiv = document.getElementById("app");
 
-        // Creating Elements
-        // TODO: Bring back all element creations to the constructor besides those for rendering items
+        this.containerDiv = document.createElement("div");
+        this.containerDiv.id = "container";
+        this.contentDiv = document.createElement("div");
+        this.contentDiv.id = "content";
+        this.appDiv.appendChild(this.containerDiv);
+
+        this.createSidebar();
+    }
+
+    createSidebar() {
         this.sidebarDiv = document.createElement("div");
         this.logoDiv = document.createElement("div");
         this.logoImage = document.createElement("i");
@@ -19,19 +26,6 @@ class DisplayController {
         this.addProjectIco = document.createElement("i");
         this.projectBtnSpan = document.createElement("span");
 
-        this.containerDiv = document.createElement("div");
-        this.contentDiv = document.createElement("div");
-        this.contentContainerDiv = document.createElement("div");
-        this.contentHeaderDiv = document.createElement("div");
-        this.currentTitleSpan = document.createElement("span");
-        this.projectSettingsIcon = document.createElement("i");
-        this.contentBodyDiv = document.createElement("div");
-        this.itemDiv = document.createElement("div");
-        this.addItemBtnDiv = document.createElement("div");
-        this.addItemIco = document.createElement("i");
-        this.addItemSpan = document.createElement("span");
-
-        // Adding style properties to Elements
         this.sidebarDiv.id = "sidebar";
         this.logoDiv.classList.add("logo");
         this.logoImage.classList.add("logo-icon", "fas", "fa-th-list", "fa-2x");
@@ -42,80 +36,6 @@ class DisplayController {
         this.addProjectIco.classList.add("fas", "fa-plus", "project-btn");
         this.projectBtnSpan.classList.add("add-task-text");
 
-        this.containerDiv.id = "container";
-        this.contentDiv.id = "content";
-        this.contentContainerDiv.id = "content-container";
-        this.contentHeaderDiv.classList.add("content-header");
-        this.currentTitleSpan.classList.add("current-project-title");
-        this.projectSettingsIcon.classList.add("fas", "fa-ellipsis-h", "fa-lg", "settings-icon");
-        this.contentBodyDiv.classList.add("content-body");
-        this.itemDiv.classList.add("items");
-        this.addItemBtnDiv.classList.add("add-item-btn");
-        this.addItemIco.classList.add("fas", "fa-plus", "item-btn");
-        this.addItemSpan.classList.add("add-item-text");
-
-         // Appending Elements
-        this.appDiv.appendChild(this.containerDiv);
-        this.containerDiv.appendChild(this.contentDiv);
-
-        this.createSidebar();
-    }
-
-    refreshDOM(area, projId) {
-        // This will be used to clear everything from the DOM
-        // Argument that will be passed is the section to be refreshed
-        if (area === "all") {
-            // Need to call this same function on itself to clear out everything rather than having the same code
-            // be in multiple spots
-
-            while (this.appDiv.firstChild) {
-                this.appDiv.removeChild(this.appDiv.lastChild);
-            }
-        } else if (area === "sidebar") {
-            // Logo area
-            while (this.logoDiv.firstChild) {
-                this.logoDiv.removeChild(this.logoDiv.lastChild);
-            }
-            // Projects UL area
-            while (this.userProjectsUl.firstChild) {
-                this.userProjectsUl.removeChild(this.userProjectsUl.lastChild);
-            }
-            // addProjectBtn area
-            while (this.addProjectBtn.firstChild) {
-                this.addProjectBtn.removeChild(this.addProjectBtn.lastChild);
-            }
-            // sidebarContainer area
-            while (this.sidebarContainerDiv.firstChild) {
-                this.sidebarContainerDiv.removeChild(this.sidebarContainerDiv.lastChild);
-            }
-            this.sidebarDiv.removeChild(this.logoDiv);
-            this.sidebarDiv.removeChild(this.sidebarContainerDiv);
-            this.containerDiv.removeChild(this.sidebarDiv);
-            this.createSidebar();
-        } else if (area === "content") {
-
-            if (document.querySelector(".items")) {
-                while(this.itemHolderDiv.firstChild) {
-                    this.itemHolderDiv.removeChild(this.itemHolderDiv.lastChild);
-                }
-            }
-
-            while (this.contentHeaderDiv.firstChild) {
-                this.contentHeaderDiv.removeChild(this.contentHeaderDiv.lastChild);
-            }
-            while (this.addItemBtnDiv.firstChild) {
-                this.addItemBtnDiv.removeChild(this.addItemBtnDiv.lastChild);
-            }
-            while (this.contentBodyDiv.firstChild) {
-                this.contentBodyDiv.removeChild(this.contentBodyDiv.lastChild);
-            }
-            while (this.contentContainerDiv.firstChild) {
-                this.contentContainerDiv.removeChild(this.contentContainerDiv.lastChild);
-            }
-        }
-    }
-
-    createSidebar() {
         this.containerDiv.appendChild(this.sidebarDiv);
         this.sidebarDiv.appendChild(this.logoDiv);
         this.logoDiv.appendChild(this.logoImage);
@@ -128,7 +48,7 @@ class DisplayController {
         this.projectBtnSpan.innerText = "Add Project";
 
         let projectList = JSON.parse(localStorage.getItem('projects'));
-        this.renderProjectsUl(projectList);
+        this.renderProjectList(projectList);
 
         this.addProjectBtn.addEventListener("click", () => {
             let eventProjCont = new Projects();
@@ -139,13 +59,13 @@ class DisplayController {
 
         document.querySelectorAll(".project").forEach(project => {
             project.addEventListener("click", event => {
-                let id = event.target.dataset.id;
-                this.renderProjectPage(id);
+                console.log(event.target.dataset.id);
+                this.renderProject(event.target.dataset.id);
             });
         });
     }
 
-    renderProjectsUl(projects) {
+    renderProjectList(projects) {
         if (projects) {
             for (let i = 0; i < projects.length; i++) {
                 this.projectLi = document.createElement("li");
@@ -157,24 +77,66 @@ class DisplayController {
         }
     }
 
-    renderProjectPage(projId) {
+    renderProject(projId) {
         let updatedProjects = JSON.parse(localStorage.getItem('projects'));
         let projItems = updatedProjects.find(p => p.id === projId).todos;
         let currentProj = projId;
-        
-        this.refreshDOM("content");
+
+        this.clearChildNodes("content");
+
+        this.contentContainerDiv = document.createElement("div");
+        this.contentHeaderDiv = document.createElement("div");
+        this.currentTitleSpan = document.createElement("span");
+        this.projectSettingsIcon = document.createElement("i");
+        this.contentBodyDiv = document.createElement("div");
+        this.itemDiv = document.createElement("div");
+        this.addItemBtnDiv = document.createElement("div");
+        this.addItemIco = document.createElement("i");
+        this.addItemSpan = document.createElement("span");
+
+        this.contentContainerDiv.id = "content-container";
+        this.contentHeaderDiv.classList.add("content-header");
+        this.currentTitleSpan.classList.add("current-project-title");
+        this.projectSettingsIcon.classList.add("fas", "fa-ellipsis-h", "fa-lg", "settings-icon");
+        this.contentBodyDiv.classList.add("content-body");
+        this.itemDiv.classList.add("items");
+        this.addItemBtnDiv.classList.add("add-item-btn");
+        this.addItemIco.classList.add("fas", "fa-plus", "item-btn");
+        this.addItemSpan.classList.add("add-item-text");
+
         this.currentTitleSpan.innerText = updatedProjects.find(p => p.id === projId).title;
         this.currentTitleSpan.setAttribute("data-proj-id", projId);
+        
+        this.containerDiv.appendChild(this.contentDiv);
         this.contentDiv.appendChild(this.contentContainerDiv);
         this.contentContainerDiv.appendChild(this.contentHeaderDiv);
         this.contentHeaderDiv.appendChild(this.currentTitleSpan);
         this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
         this.contentContainerDiv.appendChild(this.contentBodyDiv);
-        // this.renderItems(projId);
+
+        this.addItemBtnDiv.addEventListener("click", () => {
+            this.addItemEvent(projId);
+        });
+        
+        // Rendering the projects items
+        this.renderItems(projId);
+        
+        this.contentBodyDiv.appendChild(this.addItemBtnDiv);
+        this.addItemBtnDiv.appendChild(this.addItemIco);
+        this.addItemSpan.innerText = "Add Item";
+        this.addItemBtnDiv.appendChild(this.addItemSpan);
+    }
+
+    renderItems(projId) {
+        let updatedProjects = JSON.parse(localStorage.getItem('projects'));
+        let projItems = updatedProjects.find(p => p.id === projId).todos;
+        
         if (projItems.length > 0) {
             projItems.forEach(item => {
-                this.itemHolderDiv = document.createElement("div");
-                this.itemHolderDiv.classList.add("item");
+                this.itemContainerDiv = document.createElement("div");
+                this.itemContainerDiv.classList.add("items-container");
+                this.item = document.createElement("div");
+                this.item.classList.add("item");
                 this.itemOptionsDiv = document.createElement("div");
                 this.itemOptionsDiv.classList.add("item-options");
                 this.editIconOnHover = document.createElement("i");
@@ -190,33 +152,61 @@ class DisplayController {
                 this.dueDateDiv.innerText = item.dueDate;
                 this.itemHr = document.createElement("hr");
 
-                this.contentBodyDiv.appendChild(this.itemDiv);
-                this.itemDiv.appendChild(this.itemHolderDiv);
-                this.itemHolderDiv.appendChild(this.itemOptionsDiv);
+                this.contentBodyDiv.appendChild(this.itemContainerDiv);
+                this.itemContainerDiv.appendChild(this.item);
+                this.item.appendChild(this.itemOptionsDiv);
                 this.itemOptionsDiv.appendChild(this.editIconOnHover);
                 this.itemOptionsDiv.appendChild(this.itemSettingsOnHover);
-                this.itemHolderDiv.appendChild(this.itemTitleDiv);
-                this.itemHolderDiv.appendChild(this.itemRowBr);
-                this.itemHolderDiv.appendChild(this.dueDateDiv);
-                this.contentBodyDiv.appendChild(this.itemHr);
+                this.item.appendChild(this.itemTitleDiv);
+                this.item.appendChild(this.itemRowBr);
+                this.item.appendChild(this.dueDateDiv);
+                this.itemContainerDiv.appendChild(this.itemHr);
             });
         }
+    }
 
-        this.contentBodyDiv.appendChild(this.addItemBtnDiv);
-        this.addItemBtnDiv.appendChild(this.addItemIco);
-        this.addItemSpan.innerText = "Add Item";
-        this.addItemBtnDiv.appendChild(this.addItemSpan);
+    addItemEvent(projId) {
+        let eventProjCont = new Projects();
+        let itemTitle = prompt("Item Title: ");
+        let itemDueDate = prompt("Due Date (dd-MMM): ");
+        let itemDescription = prompt("Desdcription: ");
+        let itemPrio = prompt("Priority (High, Medium, Low): ");
+        let itemCompStatus = prompt("Completed? (yes or no): ");
+        eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
+        this.clearChildNodes("content");
+        this.renderProject(projId);
+    }
 
-        this.addItemBtnDiv.addEventListener("click", () => {
-            let eventProjCont = new Projects();
-            let itemTitle = prompt("Item Title: ");
-            let itemDueDate = prompt("Due Date (dd-MMM): ");
-            let itemDescription = prompt("Desdcription: ");
-            let itemPrio = prompt("Priority (High, Medium, Low): ");
-            let itemCompStatus = prompt("Completed? (yes or no): ");
-            eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, currentProj);
-        });
+    clearChildNodes(area) {
+        if (area === "content") {
+            while (this.contentDiv.firstElementChild) {
+                this.contentDiv.removeChild(this.contentDiv.firstElementChild);
+            }
+            if (this.containerDiv.lastElementChild.id === "content") {
+                this.containerDiv.removeChild(this.contentDiv);
+            }
+        } else if (area === "items") {
+            while (this.itemOptionsDiv.firstElementChild) {
+                this.itemOptionsDiv.removeChild(this.itemOptionsDiv.firstElementChild);
+            }
+            while (this.item.firstElementChild) {
+                this.item.removeChild(this.item.firstElementChild);
+            }
+            while (this.itemContainerDiv.firstElementChild) {
+                this.itemContainerDiv.removeChild(this.itemContainerDiv.firstElementChild);
+            }
+        } else if (area === "sidebar") {
+            while (this.sidebarDiv.firstElementChild) {
+                this.sidebarDiv.removeChild(this.sidebarDiv.firstElementChild);
+            }
+        } else if (area === "all") {
+            while (this.containerDiv.firstElementChild) {
+                this.containerDiv.removeChild(this.containerDiv.firstElementChild);
+            }
+        }
     }
 }
+
+// TODO: Need to decide if I want to move items from the constructor to their respective methods
 
 export default DisplayController
