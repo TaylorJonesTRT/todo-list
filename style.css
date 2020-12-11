@@ -144,6 +144,15 @@ body {
 	float: left;
 }
 
+.items-container > hr {
+	width: 100%;
+	height: 1px;
+	margin-top: 10px;
+	background-color: #464646;
+	border: none;
+	float: left;
+}
+
 .item {
 	background-attachment: fixed;
 	width: 100%;
