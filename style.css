@@ -19,8 +19,8 @@ body {
 	float: left;
 	margin-bottom: 0;
 	box-shadow: 1px 0 20px -2px #000000;
-	position: -webkit-sticky;
-	position: sticky;
+	position: -webkit-fixed;
+	position: fixed;
 }
 
 #sidebar-container {
@@ -136,6 +136,7 @@ body {
 	width: 100%;
 	margin-top: 50px;
 	float: left;
+	padding-bottom: 50px;
 }
 .content-body > hr {
 	width: 100%;
@@ -172,8 +173,18 @@ body {
 .item-options {
 	float: right;
 }
-.item-options i {
+.item-options-icon {
+	float: right;
 	margin-left: 10px;
+}
+.item-options-icon:hover {
+	cursor: pointer;
+}
+.delete-item {
+	float: right;
+}
+.item-settings {
+	float: right;
 }
 
 .add-item-btn {
