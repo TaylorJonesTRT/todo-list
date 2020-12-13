@@ -1,9 +1,12 @@
 import Projects from "./Projects";
+import { format } from 'date-fns';
 
 class DisplayController {
     constructor() {
         // Grabbing the hard coded app div
         this.appDiv = document.getElementById("app");
+
+        this.projectsModel = new Projects();
 
         this.containerDiv = document.createElement("div");
         this.containerDiv.id = "container";
@@ -12,6 +15,8 @@ class DisplayController {
         this.appDiv.appendChild(this.containerDiv);
 
         this.createSidebar();
+        this.renderProject(JSON.parse(localStorage.getItem("projects"))[0].id);
+        console.log(JSON.parse(localStorage.getItem("projects")));
     }
 
     createSidebar() {
@@ -54,12 +59,20 @@ class DisplayController {
             let eventProjCont = new Projects();
             let projTitle = prompt("Project Title: ");
             eventProjCont.createProject(projTitle);
+            let updatedProjects = JSON.parse(localStorage.getItem('projects'));
+            this.renderProject(updatedProjects[updatedProjects.length-1].id);
             this.clearChildNodes("sidebar");
         });
 
-        document.querySelectorAll(".project").forEach(project => {
+        let userProjects =  document.querySelectorAll(".project")
+
+        userProjects.forEach(project => {
             project.addEventListener("click", event => {
+                userProjects.forEach(project => {
+                    project.classList.remove("project-active");
+                });
                 this.renderProject(event.target.dataset.id);
+                project.classList.add("project-active");
             });
         });
     }
@@ -119,11 +132,28 @@ class DisplayController {
         
         // Rendering the projects items
         this.renderItems(projId);
+        document.querySelectorAll(".item").forEach(item => {
+            item.addEventListener("mouseenter", () => {
+                item.querySelector(".item-options").style.display = "block";
+            });
+            item.addEventListener("mouseleave", () => {
+                item.querySelector(".item-options").style.display = "none";
+            });
+        });
         
         this.contentBodyDiv.appendChild(this.addItemBtnDiv);
         this.addItemBtnDiv.appendChild(this.addItemIco);
         this.addItemSpan.innerText = "Add Item";
         this.addItemBtnDiv.appendChild(this.addItemSpan);
+
+        let deleteIcons = document.querySelectorAll(".delete-item");
+        deleteIcons.forEach(icon => {
+            icon.addEventListener("click", (event) => {
+                let workingItemId = icon.getAttribute("item-id");
+                // console.log(event.target.getAttribute("dataset-id"));
+                this.projectsModel.removeItem(projId, workingItemId)
+            });
+        })
     }
 
     renderItems(projId) {
@@ -138,13 +168,20 @@ class DisplayController {
                 this.item.classList.add("item");
                 this.itemOptionsDiv = document.createElement("div");
                 this.itemOptionsDiv.classList.add("item-options");
-                this.editIconOnHover = document.createElement("i");
-                this.editIconOnHover.classList.add("far", "fa-edit");
-                this.itemSettingsOnHover = document.createElement("i");
-                this.itemSettingsOnHover.classList.add("fas", "fa-ellipsis-h");
+                this.itemOptionsDiv.style.display = "none";
+                this.itemSettingsIcon = document.createElement("i");
+                this.itemSettingsIcon.classList.add("far", "fa-edit", "item-options-icon");
+                this.itemSettingsSection = document.createElement("div");
+                this.itemSettingsSection.classList.add("item-settings");
+                this.itemDeleteSection = document.createElement("div");
+                this.itemDeleteSection.classList.add("delete-item");
+                this.itemDeleteIcon = document.createElement("i");
+                this.itemDeleteIcon.classList.add("far", "fa-trash-alt", "item-options-icon");
+                this.itemDeleteSection.setAttribute("item-id", item.id);
                 this.itemTitleDiv = document.createElement("div");
                 this.itemTitleDiv.classList.add("item-title");
                 this.itemTitleDiv.innerText = item.title;
+                this.itemTitleDiv.setAttribute("dataset-id", item.id);
                 this.itemRowBr = document.createElement("br");
                 this.dueDateDiv = document.createElement("div");
                 this.dueDateDiv.classList.add("due-date");
@@ -154,14 +191,17 @@ class DisplayController {
                 this.contentBodyDiv.appendChild(this.itemContainerDiv);
                 this.itemContainerDiv.appendChild(this.item);
                 this.item.appendChild(this.itemOptionsDiv);
-                this.itemOptionsDiv.appendChild(this.editIconOnHover);
-                this.itemOptionsDiv.appendChild(this.itemSettingsOnHover);
+                this.itemDeleteSection.appendChild(this.itemDeleteIcon);
+                this.itemSettingsSection.appendChild(this.itemSettingsIcon);
+                this.itemOptionsDiv.appendChild(this.itemSettingsSection);
+                this.itemOptionsDiv.appendChild(this.itemDeleteSection);
                 this.item.appendChild(this.itemTitleDiv);
                 this.item.appendChild(this.itemRowBr);
                 this.item.appendChild(this.dueDateDiv);
                 this.itemContainerDiv.appendChild(this.itemHr);
             });
         }
+        // TODO: Add event listeners to all delete icons and item settings icons here
     }
 
     addItemEvent(projId) {

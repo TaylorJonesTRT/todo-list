@@ -6,9 +6,6 @@ class ProjectModel {
         this.title = title;
         this.todos = todos;
     }
-    grabId() {
-        return this.id;
-    }
 }
 
 export default ProjectModel;
