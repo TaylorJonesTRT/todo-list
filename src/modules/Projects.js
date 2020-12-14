@@ -26,11 +26,11 @@ class Projects {
         let workingItem = workingProj.todos.find(i => i.id === itemId);
 
         let itemIndex = workingProj.todos.indexOf(workingItem);
-        console.log(itemIndex);
-        delete this.projects.todos.workingItem;
-        // localStorage.setItem("projects", JSON.stringify(this.projects));
-        console.log(this.projects);
+        
+        workingProj.todos = workingProj.todos.filter(todo => todo.id != workingItem.id);
+        localStorage.setItem("projects", JSON.stringify(this.projects));
     }
 }
+
 
 export default Projects;

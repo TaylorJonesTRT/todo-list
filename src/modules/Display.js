@@ -150,8 +150,8 @@ class DisplayController {
         deleteIcons.forEach(icon => {
             icon.addEventListener("click", (event) => {
                 let workingItemId = icon.getAttribute("item-id");
-                // console.log(event.target.getAttribute("dataset-id"));
                 this.projectsModel.removeItem(projId, workingItemId)
+                this.renderProject(projId);
             });
         })
     }
