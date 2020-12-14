@@ -163,7 +163,7 @@ class DisplayController {
         if (projItems.length > 0) {
             projItems.forEach(item => {
                 this.itemContainerDiv = document.createElement("div");
-                this.itemContainerDiv.classList.add("items-container");
+                this.itemContainerDiv.classList.add("items-containergit");
                 this.item = document.createElement("div");
                 this.item.classList.add("item");
                 this.itemOptionsDiv = document.createElement("div");
@@ -201,7 +201,6 @@ class DisplayController {
                 this.itemContainerDiv.appendChild(this.itemHr);
             });
         }
-        // TODO: Add event listeners to all delete icons and item settings icons here
     }
 
     addItemEvent(projId) {
@@ -213,6 +212,25 @@ class DisplayController {
         let itemCompStatus = prompt("Completed? (yes or no): ");
         eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
         this.renderProject(projId);
+    }
+
+    itemForm() {
+        this.formContainer = document.createElement("div");
+        this.formHeader = document.createElement("div");
+        this.closeForm = document.createElement("div");
+        this.closeFormIcon = document.createElement("i");
+        this.newItemForm = document.createElement("form");
+        this.itemTitleInput = document.createElement("input");
+        this.itemTitleInput.type = "text";
+        this.itemTitleInput.name = "item-name-input";
+        this.itemTitleInput.classList.add("item-name-input");
+        this.itemDescInput = document.createElement("input");
+        this.itemDescInput.type = "text";
+        this.itemDescInput.id = "item-desc-input";
+        this.itemDescInput.classList.add("item-desc-input");
+        // TODO: Need to create the drop down for priority below
+        this.itemDueDateInput = document.createElement
+        // TODO: Need to create the completion status check box below
     }
 
     clearChildNodes(area) {
@@ -263,7 +281,5 @@ class DisplayController {
         }
     }
 }
-
-// TODO: Need to decide if I want to move items from the constructor to their respective methods
 
 export default DisplayController
