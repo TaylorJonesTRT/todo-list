@@ -159,6 +159,8 @@ class DisplayController {
     renderItems(projId) {
         let updatedProjects = JSON.parse(localStorage.getItem('projects'));
         let projItems = updatedProjects.find(p => p.id === projId).todos;
+
+        // TODO: Need to create and render checkboxes to the direct left of the item and create the logic behind completing an object or not
         
         if (projItems.length > 0) {
             projItems.forEach(item => {
@@ -215,6 +217,8 @@ class DisplayController {
     }
 
     itemForm() {
+        const priorities = ["High", "Medium", "Low"];
+
         this.formContainer = document.createElement("div");
         this.formHeader = document.createElement("div");
         this.closeForm = document.createElement("div");
@@ -228,9 +232,21 @@ class DisplayController {
         this.itemDescInput.type = "text";
         this.itemDescInput.id = "item-desc-input";
         this.itemDescInput.classList.add("item-desc-input");
-        // TODO: Need to create the drop down for priority below
-        this.itemDueDateInput = document.createElement
-        // TODO: Need to create the completion status check box below
+        this.prioritySelection = document.createElement("select");
+        this.prioritySelection.classList.add("priority-selection");
+        this.prioritySelection.name = "priorities";
+        for (let i = 0; i < priorities.length; i++) {
+            this.prioOption = document.createElement("option");
+            this.prioOption.value = priorities[i];
+            this.prioOption.innerText = priorities[i];
+        }
+        this.itemDueDateInput = document.createElement("input");
+        this.itemDueDateInput.type = "date";
+        this.itemDueDateInput.classList.add("item-duedate-input");
+        // TODO: Change the value for the below line to somehow show the curret date dynamically
+        this.itemDueDateInput.value = "2020-12-14";
+
+        // TODO: Need to append the items together and then setup the event listener for when add itme is clicked to make this form appear
     }
 
     clearChildNodes(area) {
