@@ -109,7 +109,7 @@ class DisplayController {
         this.contentContainerDiv.id = "content-container";
         this.contentHeaderDiv.classList.add("content-header");
         this.currentTitleSpan.classList.add("current-project-title");
-        this.projectSettingsIcon.classList.add("fas", "fa-ellipsis-h", "fa-lg", "settings-icon");
+        this.projectSettingsIcon.classList.add("far", "fa-trash-alt", "fa-lg", "settings-icon");
         this.contentBodyDiv.classList.add("content-body");
         this.itemDiv.classList.add("items");
         this.addItemBtnDiv.classList.add("add-item-btn");
@@ -117,7 +117,7 @@ class DisplayController {
         this.addItemSpan.classList.add("add-item-text");
 
         this.currentTitleSpan.innerText = updatedProjects.find(p => p.id === projId).title;
-        this.currentTitleSpan.setAttribute("data-proj-id", projId);
+        this.currentTitleSpan.setAttribute("data-id", projId);
         
         this.containerDiv.appendChild(this.contentDiv);
         this.contentDiv.appendChild(this.contentContainerDiv);
@@ -125,10 +125,6 @@ class DisplayController {
         this.contentHeaderDiv.appendChild(this.currentTitleSpan);
         this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
         this.contentContainerDiv.appendChild(this.contentBodyDiv);
-
-        this.addItemBtnDiv.addEventListener("click", () => {
-            this.addItemEvent(projId);
-        });
         
         // Rendering the projects items
         this.renderItems(projId);
@@ -146,6 +142,8 @@ class DisplayController {
         this.addItemSpan.innerText = "Add Item";
         this.addItemBtnDiv.appendChild(this.addItemSpan);
 
+        this.itemForm();
+
         let deleteIcons = document.querySelectorAll(".delete-item");
         deleteIcons.forEach(icon => {
             icon.addEventListener("click", (event) => {
@@ -153,12 +151,35 @@ class DisplayController {
                 this.projectsModel.removeItem(projId, workingItemId)
                 this.renderProject(projId);
             });
-        })
+        });
+        this.addItemBtnDiv.addEventListener("click", () => {
+            this.formContainer.style.display = "grid";
+            this.newItemSubmit.setAttribute("btn-type", "new-item");
+        });
+        // TODO: Create edit logic for items
+        let editIcons = document.querySelectorAll(".item-edit");
+        editIcons.forEach(icon => {
+            icon.addEventListener("click", event => {
+                let allProjects = JSON.parse(localStorage.getItem("projects"));
+                let itemId = icon.getAttribute("dataset-id");
+                this.formContainer.style.display = "grid";
+                let workingProj = allProjects.find(p => p.id === projId);
+                let workingItem = workingProj.todos.find(i => i.id === itemId);
+                this.formHeaderSpan.innerText = "Edit Item";
+                this.itemTitleInput.value = workingItem.title;
+                this.itemDescInput.value = workingItem.description;
+                this.prioritySelection.value = workingItem.priority;
+                this.itemDueDateInput.value = workingItem.dueDate;
+                this.newItemSubmit.setAttribute("btn-type", "new-item");
+            });
+        });
     }
 
     renderItems(projId) {
         let updatedProjects = JSON.parse(localStorage.getItem('projects'));
         let projItems = updatedProjects.find(p => p.id === projId).todos;
+
+        // TODO: Add the logic of having the checkbox checked or not depending on that items completion status
         
         if (projItems.length > 0) {
             projItems.forEach(item => {
@@ -169,10 +190,11 @@ class DisplayController {
                 this.itemOptionsDiv = document.createElement("div");
                 this.itemOptionsDiv.classList.add("item-options");
                 this.itemOptionsDiv.style.display = "none";
-                this.itemSettingsIcon = document.createElement("i");
-                this.itemSettingsIcon.classList.add("far", "fa-edit", "item-options-icon");
-                this.itemSettingsSection = document.createElement("div");
-                this.itemSettingsSection.classList.add("item-settings");
+                this.itemEditIcon = document.createElement("i");
+                this.itemEditIcon.classList.add("far", "fa-edit", "item-options-icon");
+                this.itemEditSection = document.createElement("div");
+                this.itemEditSection.classList.add("item-edit");
+                this.itemEditSection.setAttribute("dataset-id", item.id);
                 this.itemDeleteSection = document.createElement("div");
                 this.itemDeleteSection.classList.add("delete-item");
                 this.itemDeleteIcon = document.createElement("i");
@@ -187,32 +209,114 @@ class DisplayController {
                 this.dueDateDiv.classList.add("due-date");
                 this.dueDateDiv.innerText = item.dueDate;
                 this.itemHr = document.createElement("hr");
+                this.completionBox = document.createElement("input");
+                this.completionBox.type = "checkbox";
+                this.completionBox.classList.add("item-completion-status-box");
 
                 this.contentBodyDiv.appendChild(this.itemContainerDiv);
                 this.itemContainerDiv.appendChild(this.item);
                 this.item.appendChild(this.itemOptionsDiv);
                 this.itemDeleteSection.appendChild(this.itemDeleteIcon);
-                this.itemSettingsSection.appendChild(this.itemSettingsIcon);
-                this.itemOptionsDiv.appendChild(this.itemSettingsSection);
+                this.itemEditSection.appendChild(this.itemEditIcon);
+                this.itemOptionsDiv.appendChild(this.itemEditSection);
                 this.itemOptionsDiv.appendChild(this.itemDeleteSection);
+                this.item.appendChild(this.completionBox);
                 this.item.appendChild(this.itemTitleDiv);
                 this.item.appendChild(this.itemRowBr);
                 this.item.appendChild(this.dueDateDiv);
                 this.itemContainerDiv.appendChild(this.itemHr);
             });
         }
-        // TODO: Add event listeners to all delete icons and item settings icons here
     }
 
-    addItemEvent(projId) {
-        let eventProjCont = new Projects();
-        let itemTitle = prompt("Item Title: ");
-        let itemDueDate = prompt("Due Date (dd-MMM): ");
-        let itemDescription = prompt("Desdcription: ");
-        let itemPrio = prompt("Priority (High, Medium, Low): ");
-        let itemCompStatus = prompt("Completed? (yes or no): ");
-        eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
-        this.renderProject(projId);
+    // addItemEvent(projId) {
+    //     let eventProjCont = new Projects();
+    //     let itemTitle = prompt("Item Title: ");
+    //     let itemDueDate = prompt("Due Date (dd-MMM): ");
+    //     let itemDescription = prompt("Desdcription: ");
+    //     let itemPrio = prompt("Priority (High, Medium, Low): ");
+    //     let itemCompStatus = prompt("Completed? (yes or no): ");
+    //     eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
+    //     this.renderProject(projId);
+    // }
+
+    itemForm() {
+        const priorities = ["High", "Medium", "Low"];
+
+        this.formContainer = document.createElement("div");
+        this.formContainer.classList.add("new-item-form");
+        this.formHeader = document.createElement("div");
+        this.formHeader.classList.add("form-header");
+        this.formHeaderSpan = document.createElement("span");
+        this.formHeaderSpan.innerText = "New Item";
+        this.formHeaderSpan.classList.add("form-header-span")
+        this.closeForm = document.createElement("div");
+        this.closeForm.classList.add("close-form");
+        this.closeFormIcon = document.createElement("i");
+        this.closeFormIcon.classList.add("fas", "fa-times", "close-form-icon");
+        this.newItemForm = document.createElement("form");
+        this.itemTitleInput = document.createElement("input");
+        this.itemTitleInput.type = "text";
+        this.itemTitleInput.name = "item-name-input";
+        this.itemTitleInput.placeholder = "Title: Example Item";
+        this.itemTitleInput.classList.add("item-name-input");
+        this.itemDescInput = document.createElement("textarea");
+        this.itemDescInput.wrap = "soft";
+        this.itemDescInput.placeholder = "Item Description...";
+        this.itemDescInput.classList.add("item-desc-input");
+        this.prioritySelection = document.createElement("select");
+        this.prioritySelection.classList.add("priority-selection");
+        this.prioritySelection.name = "priorities";        
+        this.itemDueDateInput = document.createElement("input");
+        this.itemDueDateInput.type = "date";
+        this.itemDueDateInput.classList.add("item-duedate-input");
+        this.newItemSubmit = document.createElement("input");
+        this.newItemSubmit.type = "submit";
+        this.newItemSubmit.setAttribute("btn-type", "new-item");
+        this.prioOptionDisabled = document.createElement("option");
+        this.prioOptionDisabled.disabled = "disabled";
+        this.prioOptionDisabled.selected = "selected";
+        this.prioOptionDisabled.innerText = "Select Priority";
+        this.prioritySelection.appendChild(this.prioOptionDisabled);
+
+        this.contentBodyDiv.appendChild(this.formContainer)
+        this.formContainer.appendChild(this.formHeader);
+        this.formHeader.appendChild(this.formHeaderSpan);
+        this.formHeader.appendChild(this.closeForm);
+        this.closeForm.appendChild(this.closeFormIcon);
+        this.formContainer.appendChild(this.newItemForm);
+        this.newItemForm.appendChild(this.itemTitleInput);
+        this.newItemForm.appendChild(this.itemDescInput);
+        this.newItemForm.appendChild(this.prioritySelection);
+        this.newItemForm.appendChild(this.itemDueDateInput);
+        this.newItemForm.appendChild(this.newItemSubmit);
+
+        for (let i = 0; i < priorities.length; i++) {
+            this.prioOption = document.createElement("option");
+            this.prioOption.value = priorities[i];
+            this.prioOption.innerText = priorities[i];
+            this.prioOption.classList.add("option-text");
+            this.prioritySelection.appendChild(this.prioOption);
+        }
+        this.closeForm.addEventListener("click", () => {
+            this.formContainer.style.display = "none";
+            this.itemTitleInput.value = "";
+            this.itemDescInput.value = "";
+        });
+        this.newItemSubmit.addEventListener("click", () => {
+            let title = this.itemTitleInput.value;
+            let dueDate = this.itemDueDateInput.value;
+            let desc = this.itemDescInput.value;
+            let prio = this.prioritySelection.value;
+            let projId = this.currentTitleSpan.dataset.id;
+            let completionStatus = "no";
+            if (this.newItemSubmit.getAttribute("btn-type") === "new-item") {
+                this.projectsModel.addItem(title, dueDate, desc, prio, completionStatus, projId)
+            } else if (this.newItemSubmit.getAttribute("btn-type") === "edit") {
+                // TODO: Figure out a way to grab the items id that is being editited
+                this.projectsModel.editItem(title, dueDate, desc, prio, completionStatus, projId);
+            }
+        });
     }
 
     clearChildNodes(area) {
@@ -263,7 +367,5 @@ class DisplayController {
         }
     }
 }
-
-// TODO: Need to decide if I want to move items from the constructor to their respective methods
 
 export default DisplayController
