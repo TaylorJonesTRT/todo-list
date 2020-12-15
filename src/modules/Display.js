@@ -117,7 +117,7 @@ class DisplayController {
         this.addItemSpan.classList.add("add-item-text");
 
         this.currentTitleSpan.innerText = updatedProjects.find(p => p.id === projId).title;
-        this.currentTitleSpan.setAttribute("data-proj-id", projId);
+        this.currentTitleSpan.setAttribute("data-id", projId);
         
         this.containerDiv.appendChild(this.contentDiv);
         this.contentDiv.appendChild(this.contentContainerDiv);
@@ -155,14 +155,13 @@ class DisplayController {
         this.addItemBtnDiv.addEventListener("click", () => {
             this.formContainer.style.display = "grid";
         });
-        // TODO: Create the event listener for the submit button and the logic to go with running the addItem method
     }
 
     renderItems(projId) {
         let updatedProjects = JSON.parse(localStorage.getItem('projects'));
         let projItems = updatedProjects.find(p => p.id === projId).todos;
 
-        // TODO: Need to create and render checkboxes to the direct left of the item and create the logic behind completing an object or not
+        // TODO: Add the logic of having the checkbox checked or not depending on that items completion status
         
         if (projItems.length > 0) {
             projItems.forEach(item => {
@@ -254,6 +253,11 @@ class DisplayController {
         this.itemDueDateInput.classList.add("item-duedate-input");
         this.newItemSubmit = document.createElement("input");
         this.newItemSubmit.type = "submit";
+        this.prioOptionDisabled = document.createElement("option");
+        this.prioOptionDisabled.disabled = "disabled";
+        this.prioOptionDisabled.selected = "selected";
+        this.prioOptionDisabled.innerText = "Select Priority";
+        this.prioritySelection.appendChild(this.prioOptionDisabled);
 
         this.contentBodyDiv.appendChild(this.formContainer)
         this.formContainer.appendChild(this.formHeader);
@@ -271,8 +275,23 @@ class DisplayController {
             this.prioOption = document.createElement("option");
             this.prioOption.value = priorities[i];
             this.prioOption.innerText = priorities[i];
+            this.prioOption.classList.add("option-text");
             this.prioritySelection.appendChild(this.prioOption);
         }
+        this.closeForm.addEventListener("click", () => {
+            this.formContainer.style.display = "none";
+            this.itemTitleInput.value = "";
+            this.itemDescInput.value = "";
+        });
+        this.newItemSubmit.addEventListener("click", () => {
+            let title = this.itemTitleInput.value;
+            let dueDate = this.itemDueDateInput.value;
+            let desc = this.itemDescInput.value;
+            let prio = this.prioritySelection.value;
+            let projId = this.currentTitleSpan.dataset.id;
+            let completionStatus = "no";
+            this.projectsModel.addItem(title, dueDate, desc, prio, completionStatus, projId)
+        });
     }
 
     clearChildNodes(area) {
