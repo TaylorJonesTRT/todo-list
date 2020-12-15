@@ -242,6 +242,7 @@ body {
 	float: right;
 	margin-right: 20px;
 	color: #fff;
+	cursor: pointer;
 }
 
 .new-item-form form {
@@ -280,7 +281,7 @@ body {
 }
 .priority-selection {
 	grid-row: 3/4;
-	width: 100px;
+	width: 115px;
 	height: 30px;
 	margin: auto;
 	margin-left: 10px;
@@ -328,6 +329,10 @@ input[type="submit"] {
 	grid-row: 3/4;
 	float: right;
 	margin-right: 15px;
+}
+
+.option-text {
+	color: #000000;
 }
 
 /* When moving the mouse over the submit button, add a darker green color */
