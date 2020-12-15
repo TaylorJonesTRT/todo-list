@@ -24,9 +24,6 @@ class Projects {
     removeItem(projId, itemId) {
         let workingProj = this.projects.find(p => p.id === projId);
         let workingItem = workingProj.todos.find(i => i.id === itemId);
-
-        let itemIndex = workingProj.todos.indexOf(workingItem);
-        
         workingProj.todos = workingProj.todos.filter(todo => todo.id != workingItem.id);
         localStorage.setItem("projects", JSON.stringify(this.projects));
     }

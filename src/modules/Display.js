@@ -125,10 +125,6 @@ class DisplayController {
         this.contentHeaderDiv.appendChild(this.currentTitleSpan);
         this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
         this.contentContainerDiv.appendChild(this.contentBodyDiv);
-
-        this.addItemBtnDiv.addEventListener("click", () => {
-            this.addItemEvent(projId);
-        });
         
         // Rendering the projects items
         this.renderItems(projId);
@@ -146,6 +142,8 @@ class DisplayController {
         this.addItemSpan.innerText = "Add Item";
         this.addItemBtnDiv.appendChild(this.addItemSpan);
 
+        this.itemForm();
+
         let deleteIcons = document.querySelectorAll(".delete-item");
         deleteIcons.forEach(icon => {
             icon.addEventListener("click", (event) => {
@@ -153,7 +151,11 @@ class DisplayController {
                 this.projectsModel.removeItem(projId, workingItemId)
                 this.renderProject(projId);
             });
-        })
+        });
+        this.addItemBtnDiv.addEventListener("click", () => {
+            this.formContainer.style.display = "grid";
+        });
+        // TODO: Create the event listener for the submit button and the logic to go with running the addItem method
     }
 
     renderItems(projId) {
@@ -165,7 +167,7 @@ class DisplayController {
         if (projItems.length > 0) {
             projItems.forEach(item => {
                 this.itemContainerDiv = document.createElement("div");
-                this.itemContainerDiv.classList.add("items-containergit");
+                this.itemContainerDiv.classList.add("items-container");
                 this.item = document.createElement("div");
                 this.item.classList.add("item");
                 this.itemOptionsDiv = document.createElement("div");
@@ -189,6 +191,9 @@ class DisplayController {
                 this.dueDateDiv.classList.add("due-date");
                 this.dueDateDiv.innerText = item.dueDate;
                 this.itemHr = document.createElement("hr");
+                this.completionBox = document.createElement("input");
+                this.completionBox.type = "checkbox";
+                this.completionBox.classList.add("item-completion-status-box");
 
                 this.contentBodyDiv.appendChild(this.itemContainerDiv);
                 this.itemContainerDiv.appendChild(this.item);
@@ -197,6 +202,7 @@ class DisplayController {
                 this.itemSettingsSection.appendChild(this.itemSettingsIcon);
                 this.itemOptionsDiv.appendChild(this.itemSettingsSection);
                 this.itemOptionsDiv.appendChild(this.itemDeleteSection);
+                this.item.appendChild(this.completionBox);
                 this.item.appendChild(this.itemTitleDiv);
                 this.item.appendChild(this.itemRowBr);
                 this.item.appendChild(this.dueDateDiv);
@@ -205,48 +211,68 @@ class DisplayController {
         }
     }
 
-    addItemEvent(projId) {
-        let eventProjCont = new Projects();
-        let itemTitle = prompt("Item Title: ");
-        let itemDueDate = prompt("Due Date (dd-MMM): ");
-        let itemDescription = prompt("Desdcription: ");
-        let itemPrio = prompt("Priority (High, Medium, Low): ");
-        let itemCompStatus = prompt("Completed? (yes or no): ");
-        eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
-        this.renderProject(projId);
-    }
+    // addItemEvent(projId) {
+    //     let eventProjCont = new Projects();
+    //     let itemTitle = prompt("Item Title: ");
+    //     let itemDueDate = prompt("Due Date (dd-MMM): ");
+    //     let itemDescription = prompt("Desdcription: ");
+    //     let itemPrio = prompt("Priority (High, Medium, Low): ");
+    //     let itemCompStatus = prompt("Completed? (yes or no): ");
+    //     eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
+    //     this.renderProject(projId);
+    // }
 
     itemForm() {
         const priorities = ["High", "Medium", "Low"];
 
         this.formContainer = document.createElement("div");
+        this.formContainer.classList.add("new-item-form");
         this.formHeader = document.createElement("div");
+        this.formHeader.classList.add("form-header");
+        this.formHeaderSpan = document.createElement("span");
+        this.formHeaderSpan.innerText = "New Item";
+        this.formHeaderSpan.classList.add("form-header-span")
         this.closeForm = document.createElement("div");
+        this.closeForm.classList.add("close-form");
         this.closeFormIcon = document.createElement("i");
+        this.closeFormIcon.classList.add("fas", "fa-times", "close-form-icon");
         this.newItemForm = document.createElement("form");
         this.itemTitleInput = document.createElement("input");
         this.itemTitleInput.type = "text";
         this.itemTitleInput.name = "item-name-input";
+        this.itemTitleInput.placeholder = "Title: Example Item";
         this.itemTitleInput.classList.add("item-name-input");
-        this.itemDescInput = document.createElement("input");
-        this.itemDescInput.type = "text";
-        this.itemDescInput.id = "item-desc-input";
+        this.itemDescInput = document.createElement("textarea");
+        this.itemDescInput.wrap = "soft";
+        this.itemDescInput.placeholder = "Item Description...";
         this.itemDescInput.classList.add("item-desc-input");
         this.prioritySelection = document.createElement("select");
         this.prioritySelection.classList.add("priority-selection");
-        this.prioritySelection.name = "priorities";
+        this.prioritySelection.name = "priorities";        
+        this.itemDueDateInput = document.createElement("input");
+        this.itemDueDateInput.type = "date";
+        this.itemDueDateInput.classList.add("item-duedate-input");
+        this.newItemSubmit = document.createElement("input");
+        this.newItemSubmit.type = "submit";
+
+        this.contentBodyDiv.appendChild(this.formContainer)
+        this.formContainer.appendChild(this.formHeader);
+        this.formHeader.appendChild(this.formHeaderSpan);
+        this.formHeader.appendChild(this.closeForm);
+        this.closeForm.appendChild(this.closeFormIcon);
+        this.formContainer.appendChild(this.newItemForm);
+        this.newItemForm.appendChild(this.itemTitleInput);
+        this.newItemForm.appendChild(this.itemDescInput);
+        this.newItemForm.appendChild(this.prioritySelection);
+        this.newItemForm.appendChild(this.itemDueDateInput);
+        this.newItemForm.appendChild(this.newItemSubmit);
+
         for (let i = 0; i < priorities.length; i++) {
             this.prioOption = document.createElement("option");
             this.prioOption.value = priorities[i];
             this.prioOption.innerText = priorities[i];
+            this.prioritySelection.appendChild(this.prioOption);
         }
-        this.itemDueDateInput = document.createElement("input");
-        this.itemDueDateInput.type = "date";
-        this.itemDueDateInput.classList.add("item-duedate-input");
-        // TODO: Change the value for the below line to somehow show the curret date dynamically
-        this.itemDueDateInput.value = "2020-12-14";
-
-        // TODO: Need to append the items together and then setup the event listener for when add itme is clicked to make this form appear
     }
 
     clearChildNodes(area) {
