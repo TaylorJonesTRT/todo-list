@@ -19,7 +19,10 @@ class Projects {
         localStorage.setItem("projects", JSON.stringify(this.projects));
     }
 
-    editItem(projId, itemId) {}
+    editItem(title, dueDate, description, priority, completionStatus, projId, itemId) {
+        let workingProj = this.projects.find(p => p.id === projId);
+        let workingItem = workingProj.todos.find(i => i.id === itemId);
+    }
 
     removeItem(projId, itemId) {
         let workingProj = this.projects.find(p => p.id === projId);

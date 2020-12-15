@@ -184,7 +184,7 @@ body {
 .delete-item {
 	float: right;
 }
-.item-settings {
+.item-edit {
 	float: right;
 }
 .item-completion-status-box {
@@ -192,6 +192,8 @@ body {
 	margin-right: 10px;
 }
 .completed-item {
+	opacity: 50;
+	text-decoration: line-through;
 }
 
 .add-item-btn {
