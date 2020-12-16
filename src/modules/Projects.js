@@ -13,6 +13,11 @@ class Projects {
         localStorage.setItem('projects', JSON.stringify(this.projects));
     }
 
+    removeProject() {
+        // TODO: Setup the remove project logic
+        console.log("hi");
+    }
+
     addItem(title, dueDate, description, priority, completionStatus, projId) {
         let newItem = new ItemModel(title, dueDate, description, priority, completionStatus);
         this.projects.find(p => p.id === projId).todos.push(newItem);

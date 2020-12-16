@@ -130,6 +130,7 @@ body {
 .settings-icon {
 	float: right;
 	margin-top: 5px;
+	cursor: pointer;
 }
 
 .content-body {
@@ -192,8 +193,9 @@ body {
 	margin-right: 10px;
 }
 .completed-item {
-	opacity: 50;
-	text-decoration: line-through;
+	opacity: 0.5;
+	text-decoration: line-through !important;
+	font-style: italic;
 }
 
 .add-item-btn {

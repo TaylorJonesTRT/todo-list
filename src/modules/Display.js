@@ -15,8 +15,8 @@ class DisplayController {
         this.appDiv.appendChild(this.containerDiv);
 
         this.createSidebar();
-        this.renderProject(JSON.parse(localStorage.getItem("projects"))[0].id);
-        console.log(JSON.parse(localStorage.getItem("projects")));
+        this.projects = JSON.parse(localStorage.getItem("projects"));
+        this.renderProject(this.projects[0].id);
     }
 
     createSidebar() {
@@ -99,6 +99,7 @@ class DisplayController {
         this.contentContainerDiv = document.createElement("div");
         this.contentHeaderDiv = document.createElement("div");
         this.currentTitleSpan = document.createElement("span");
+        this.projectSettingsDiv = document.createElement("div");
         this.projectSettingsIcon = document.createElement("i");
         this.contentBodyDiv = document.createElement("div");
         this.itemDiv = document.createElement("div");
@@ -109,7 +110,8 @@ class DisplayController {
         this.contentContainerDiv.id = "content-container";
         this.contentHeaderDiv.classList.add("content-header");
         this.currentTitleSpan.classList.add("current-project-title");
-        this.projectSettingsIcon.classList.add("far", "fa-trash-alt", "fa-lg", "settings-icon");
+        this.projectSettingsDiv.classList.add("settings-icon");
+        this.projectSettingsIcon.classList.add("far", "fa-trash-alt", "fa-lg");
         this.contentBodyDiv.classList.add("content-body");
         this.itemDiv.classList.add("items");
         this.addItemBtnDiv.classList.add("add-item-btn");
@@ -123,7 +125,8 @@ class DisplayController {
         this.contentDiv.appendChild(this.contentContainerDiv);
         this.contentContainerDiv.appendChild(this.contentHeaderDiv);
         this.contentHeaderDiv.appendChild(this.currentTitleSpan);
-        this.contentHeaderDiv.appendChild(this.projectSettingsIcon);
+        this.projectSettingsDiv.appendChild(this.projectSettingsIcon);
+        this.contentHeaderDiv.appendChild(this.projectSettingsDiv);
         this.contentContainerDiv.appendChild(this.contentBodyDiv);
         
         // Rendering the projects items
@@ -152,11 +155,22 @@ class DisplayController {
                 this.renderProject(projId);
             });
         });
+        // TODO: Add logic to the delete project icon so that the project will be delted when clicked
+        this.projectSettingsDiv.addEventListener("click", () => {
+            this.projectsModel.removeProject();
+        })
+
         this.addItemBtnDiv.addEventListener("click", () => {
             this.formContainer.style.display = "grid";
             this.newItemSubmit.setAttribute("btn-type", "new-item");
+            this.formHeaderSpan.innerText = "Add Item";
+            this.formHeaderSpan.innerText = "Edit Item";
+            this.itemTitleInput.value = "";
+            this.itemDescInput.value = "";
+            this.prioritySelection.value = "";
+            this.itemDueDateInput.value = "";
+            this.newItemSubmit.setAttribute("btn-type", "new-item");
         });
-        // TODO: Create edit logic for items
         let editIcons = document.querySelectorAll(".item-edit");
         editIcons.forEach(icon => {
             icon.addEventListener("click", event => {
@@ -173,13 +187,31 @@ class DisplayController {
                 this.newItemSubmit.setAttribute("btn-type", "new-item");
             });
         });
+        // TODO: need to make it so that the items are changed on click and not on page refresh or project switch
+        let completionBoxes = document.getElementsByName("item-status");
+        completionBoxes.forEach(box => {
+            let itemId = box.getAttribute("item-id");
+            let workingProj = this.projects.find(p => p.id === projId);
+            let workingItem = workingProj.todos.find(i => i.id === itemId);
+            box.addEventListener("click", () => {
+                if (box.checked === false) {
+                    workingItem.completionStatus = false;
+                    localStorage.setItem("projects", JSON.stringify(this.projects));
+                    this.clearChildNodes("items");
+                    this.renderItems(projId);
+                } else {
+                    workingItem.completionStatus = true;
+                    localStorage.setItem("projects", JSON.stringify(this.projects));
+                    this.clearChildNodes("items");
+                    this.renderItems(projId);
+                }
+            });
+        });
     }
 
     renderItems(projId) {
         let updatedProjects = JSON.parse(localStorage.getItem('projects'));
         let projItems = updatedProjects.find(p => p.id === projId).todos;
-
-        // TODO: Add the logic of having the checkbox checked or not depending on that items completion status
         
         if (projItems.length > 0) {
             projItems.forEach(item => {
@@ -212,6 +244,8 @@ class DisplayController {
                 this.completionBox = document.createElement("input");
                 this.completionBox.type = "checkbox";
                 this.completionBox.classList.add("item-completion-status-box");
+                this.completionBox.setAttribute("item-id", item.id);
+                this.completionBox.name = "item-status";
 
                 this.contentBodyDiv.appendChild(this.itemContainerDiv);
                 this.itemContainerDiv.appendChild(this.item);
@@ -225,6 +259,14 @@ class DisplayController {
                 this.item.appendChild(this.itemRowBr);
                 this.item.appendChild(this.dueDateDiv);
                 this.itemContainerDiv.appendChild(this.itemHr);
+
+                if (item.completionStatus === true) {
+                    this.completionBox.checked = true;
+                    this.item.classList.add("completed-item");
+                } else {
+                    this.completionBox.checked = false;
+                    this.item.classList.remove("completed-item");
+                }
             });
         }
     }
@@ -303,13 +345,14 @@ class DisplayController {
             this.itemTitleInput.value = "";
             this.itemDescInput.value = "";
         });
+        // TODO: Move this eventlistener to another method so can grab the item id
         this.newItemSubmit.addEventListener("click", () => {
             let title = this.itemTitleInput.value;
             let dueDate = this.itemDueDateInput.value;
             let desc = this.itemDescInput.value;
             let prio = this.prioritySelection.value;
             let projId = this.currentTitleSpan.dataset.id;
-            let completionStatus = "no";
+            let completionStatus = false;
             if (this.newItemSubmit.getAttribute("btn-type") === "new-item") {
                 this.projectsModel.addItem(title, dueDate, desc, prio, completionStatus, projId)
             } else if (this.newItemSubmit.getAttribute("btn-type") === "edit") {
@@ -333,6 +376,7 @@ class DisplayController {
                 this.containerDiv.removeChild(this.contentDiv);
             }
         } else if (area === "items") {
+            // TODO: Make sure all areas are clear of items so that it will refresh properly
             while (this.itemOptionsDiv.firstElementChild) {
                 this.itemOptionsDiv.removeChild(this.itemOptionsDiv.firstElementChild);
             }
