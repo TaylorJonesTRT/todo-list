@@ -28,6 +28,6 @@ NPM (npx webpack and in the future date-fns to better format the due dates for i
 
 
 
-
+------
 
 Thanks to [The Odin Project](https://www.theodinproject.com) for their curriculum in learning to become a programmer.
