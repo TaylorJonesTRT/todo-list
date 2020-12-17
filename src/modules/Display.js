@@ -412,5 +412,5 @@ class DisplayController {
 
 export default DisplayController
 
-// TODO!: Need to setup date formatting using the npm module that's already imported
+// TODO!: Need to setup date formatting using the npm module that's already imported (future addition)
 // TODO: Need to figure out why the text isn't becoming italic when completionStatus is True. CSS issue
