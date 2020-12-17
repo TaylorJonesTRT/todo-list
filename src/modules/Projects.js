@@ -10,12 +10,13 @@ class Projects {
     createProject(title) {
         const newProject = new ProjectModel(title);
         this.projects.push(newProject);
-        localStorage.setItem('projects', JSON.stringify(this.projects));
+        localStorage.setItem("projects", JSON.stringify(this.projects));
     }
 
-    removeProject() {
-        // TODO: Setup the remove project logic
-        console.log("hi");
+    removeProject(projId) {
+        let workingProj = this.projects.find(p => p.id === projId);
+        this.projects = this.projects.filter(proj => proj.id != workingProj.id);
+        localStorage.setItem("projects", JSON.stringify(this.projects));
     }
 
     addItem(title, dueDate, description, priority, completionStatus, projId) {
@@ -27,6 +28,13 @@ class Projects {
     editItem(title, dueDate, description, priority, completionStatus, projId, itemId) {
         let workingProj = this.projects.find(p => p.id === projId);
         let workingItem = workingProj.todos.find(i => i.id === itemId);
+
+        workingItem.title = title;
+        workingItem.dueDate = dueDate;
+        workingItem.description = description;
+        workingItem.priority = priority;
+        workingItem.completionStatus = completionStatus;
+        localStorage.setItem("projects", JSON.stringify(this.projects));
     }
 
     removeItem(projId, itemId) {

@@ -209,13 +209,13 @@ body {
 	color: #c84b25;
 }
 
-.priority-important {
+.priority-high {
 	color: #c84b25;
 }
 .priority-medium {
 	color: #f3cb45;
 }
-.priority-regular {
+.priority-low {
 	color: #3976d4;
 }
 

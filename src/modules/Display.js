@@ -155,21 +155,21 @@ class DisplayController {
                 this.renderProject(projId);
             });
         });
-        // TODO: Add logic to the delete project icon so that the project will be delted when clicked
         this.projectSettingsDiv.addEventListener("click", () => {
-            this.projectsModel.removeProject();
+            this.projectsModel.removeProject(projId);
+            this.clearChildNodes("sidebar");
+            this.renderProject(this.projects[0].id);
         })
 
         this.addItemBtnDiv.addEventListener("click", () => {
+            this.newItemSubmit.removeAttribute("item-id");
             this.formContainer.style.display = "grid";
-            this.newItemSubmit.setAttribute("btn-type", "new-item");
+            this.newItemSubmit.setAttribute("btn-type", "new");
             this.formHeaderSpan.innerText = "Add Item";
-            this.formHeaderSpan.innerText = "Edit Item";
             this.itemTitleInput.value = "";
             this.itemDescInput.value = "";
             this.prioritySelection.value = "";
             this.itemDueDateInput.value = "";
-            this.newItemSubmit.setAttribute("btn-type", "new-item");
         });
         let editIcons = document.querySelectorAll(".item-edit");
         editIcons.forEach(icon => {
@@ -184,10 +184,10 @@ class DisplayController {
                 this.itemDescInput.value = workingItem.description;
                 this.prioritySelection.value = workingItem.priority;
                 this.itemDueDateInput.value = workingItem.dueDate;
-                this.newItemSubmit.setAttribute("btn-type", "new-item");
+                this.newItemSubmit.setAttribute("btn-type", "edit");
+                this.newItemSubmit.setAttribute("item-id", itemId);
             });
         });
-        // TODO: need to make it so that the items are changed on click and not on page refresh or project switch
         let completionBoxes = document.getElementsByName("item-status");
         completionBoxes.forEach(box => {
             let itemId = box.getAttribute("item-id");
@@ -198,14 +198,30 @@ class DisplayController {
                     workingItem.completionStatus = false;
                     localStorage.setItem("projects", JSON.stringify(this.projects));
                     this.clearChildNodes("items");
-                    this.renderItems(projId);
+                    this.renderProject(projId);
                 } else {
                     workingItem.completionStatus = true;
                     localStorage.setItem("projects", JSON.stringify(this.projects));
                     this.clearChildNodes("items");
-                    this.renderItems(projId);
+                    this.renderProject(projId);
                 }
             });
+        });
+        this.newItemSubmit.addEventListener("click", () => {
+            let title = this.itemTitleInput.value;
+            let dueDate = this.itemDueDateInput.value;
+            let desc = this.itemDescInput.value;
+            let prio = this.prioritySelection.value;
+            let projectId = this.currentTitleSpan.dataset.id;
+            let completionStatus = false;
+            if (this.newItemSubmit.getAttribute("btn-type") === "new") {
+                this.projectsModel.addItem(title, dueDate, desc, prio, completionStatus, projectId)
+                this.renderProject(projId);
+            } else if (this.newItemSubmit.getAttribute("btn-type") === "edit") {
+                let itemId = this.newItemSubmit.getAttribute("item-id");
+                this.projectsModel.editItem(title, dueDate, desc, prio, completionStatus, projectId, itemId);
+                this.renderProject(projId);
+            }
         });
     }
 
@@ -262,25 +278,22 @@ class DisplayController {
 
                 if (item.completionStatus === true) {
                     this.completionBox.checked = true;
-                    this.item.classList.add("completed-item");
+                    this.itemContainerDiv.classList.add("completed-item");
                 } else {
                     this.completionBox.checked = false;
-                    this.item.classList.remove("completed-item");
+                    this.itemContainerDiv.classList.remove("completed-item");
+                }
+
+                if (item.priority === "High") {
+                    this.dueDateDiv.classList.add("priority-high");
+                } else if (item.priority === "Medium") {
+                    this.dueDateDiv.classList.add("priority-medium");
+                } else if (item.priority === "Low") {
+                    this.dueDateDiv.classList.add("priority-low");
                 }
             });
         }
     }
-
-    // addItemEvent(projId) {
-    //     let eventProjCont = new Projects();
-    //     let itemTitle = prompt("Item Title: ");
-    //     let itemDueDate = prompt("Due Date (dd-MMM): ");
-    //     let itemDescription = prompt("Desdcription: ");
-    //     let itemPrio = prompt("Priority (High, Medium, Low): ");
-    //     let itemCompStatus = prompt("Completed? (yes or no): ");
-    //     eventProjCont.addItem(itemTitle, itemDueDate, itemDescription, itemPrio, itemCompStatus, projId);
-    //     this.renderProject(projId);
-    // }
 
     itemForm() {
         const priorities = ["High", "Medium", "Low"];
@@ -316,8 +329,9 @@ class DisplayController {
         this.newItemSubmit.type = "submit";
         this.newItemSubmit.setAttribute("btn-type", "new-item");
         this.prioOptionDisabled = document.createElement("option");
-        this.prioOptionDisabled.disabled = "disabled";
+        this;this.prioOptionDisabled.value = "";
         this.prioOptionDisabled.selected = "selected";
+        this.prioOptionDisabled.disabled = "disabled";
         this.prioOptionDisabled.innerText = "Select Priority";
         this.prioritySelection.appendChild(this.prioOptionDisabled);
 
@@ -345,21 +359,6 @@ class DisplayController {
             this.itemTitleInput.value = "";
             this.itemDescInput.value = "";
         });
-        // TODO: Move this eventlistener to another method so can grab the item id
-        this.newItemSubmit.addEventListener("click", () => {
-            let title = this.itemTitleInput.value;
-            let dueDate = this.itemDueDateInput.value;
-            let desc = this.itemDescInput.value;
-            let prio = this.prioritySelection.value;
-            let projId = this.currentTitleSpan.dataset.id;
-            let completionStatus = false;
-            if (this.newItemSubmit.getAttribute("btn-type") === "new-item") {
-                this.projectsModel.addItem(title, dueDate, desc, prio, completionStatus, projId)
-            } else if (this.newItemSubmit.getAttribute("btn-type") === "edit") {
-                // TODO: Figure out a way to grab the items id that is being editited
-                this.projectsModel.editItem(title, dueDate, desc, prio, completionStatus, projId);
-            }
-        });
     }
 
     clearChildNodes(area) {
@@ -376,7 +375,6 @@ class DisplayController {
                 this.containerDiv.removeChild(this.contentDiv);
             }
         } else if (area === "items") {
-            // TODO: Make sure all areas are clear of items so that it will refresh properly
             while (this.itemOptionsDiv.firstElementChild) {
                 this.itemOptionsDiv.removeChild(this.itemOptionsDiv.firstElementChild);
             }
@@ -413,3 +411,6 @@ class DisplayController {
 }
 
 export default DisplayController
+
+// TODO!: Need to setup date formatting using the npm module that's already imported
+// TODO: Need to figure out why the text isn't becoming italic when completionStatus is True. CSS issue
