@@ -17,6 +17,7 @@ class DisplayController {
         this.createSidebar();
         this.projects = JSON.parse(localStorage.getItem("projects"));
         this.renderProject(this.projects[0].id);
+        console.log(this.projectsModel);
     }
 
     createSidebar() {
